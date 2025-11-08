@@ -620,27 +620,7 @@
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QGraphicsView" name="graphicsView">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QFrame" name="frame_3">
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>50</height>
-             </size>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::Shape::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Shadow::Raised</enum>
-            </property>
-           </widget>
+           <widget class="MyOpenGLWidget" name="openGLWidget"/>
           </item>
          </layout>
         </widget>
@@ -651,6 +631,13 @@
    </layout>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MyOpenGLWidget</class>
+   <extends>QOpenGLWidget</extends>
+   <header location="global">MyOpenGLWidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../QtGuiApp/resources.qrc"/>
  </resources>

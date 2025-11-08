@@ -9,12 +9,12 @@
 #ifndef MAINWINDOW_2D_UI_H
 #define MAINWINDOW_2D_UI_H
 
+#include <MyOpenGLWidget.h>
 #include <QtCore/QVariant>
 #include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QFrame>
-#include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
@@ -62,8 +62,7 @@ public:
     QHBoxLayout *horizontalLayout;
     QLabel *label_hospital;
     QLabel *label_currenttime;
-    QGraphicsView *graphicsView;
-    QFrame *frame_3;
+    MyOpenGLWidget *openGLWidget;
 
     void setupUi(QMainWindow *MainWindow_UI)
     {
@@ -304,19 +303,10 @@ public:
 
         gridLayout_3->addWidget(frame1, 0, 0, 1, 1);
 
-        graphicsView = new QGraphicsView(frame_main);
-        graphicsView->setObjectName("graphicsView");
-        graphicsView->setEnabled(false);
+        openGLWidget = new MyOpenGLWidget(frame_main);
+        openGLWidget->setObjectName("openGLWidget");
 
-        gridLayout_3->addWidget(graphicsView, 1, 0, 1, 1);
-
-        frame_3 = new QFrame(frame_main);
-        frame_3->setObjectName("frame_3");
-        frame_3->setMaximumSize(QSize(16777215, 50));
-        frame_3->setFrameShape(QFrame::Shape::StyledPanel);
-        frame_3->setFrameShadow(QFrame::Shadow::Raised);
-
-        gridLayout_3->addWidget(frame_3, 2, 0, 1, 1);
+        gridLayout_3->addWidget(openGLWidget, 1, 0, 1, 1);
 
 
         gridLayout_2->addWidget(frame_main, 0, 0, 1, 1);
