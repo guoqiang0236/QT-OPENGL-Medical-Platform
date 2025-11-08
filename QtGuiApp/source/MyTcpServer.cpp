@@ -1,4 +1,4 @@
-﻿#include "MyTcpServer.h"
+#include "MyTcpServer.h"
 #include <QDebug>
 
 MyTcpServer::MyTcpServer(QObject* parent)

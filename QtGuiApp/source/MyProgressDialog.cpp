@@ -1,4 +1,4 @@
-﻿#include "MyProgressDialog.h"
+#include "MyProgressDialog.h"
 
 MyProgressDialog::MyProgressDialog(const QString& labelText, QWidget* parent)
     : QProgressDialog(labelText, tr("取消"), 0, 100, parent)

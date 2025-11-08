@@ -1,4 +1,4 @@
-﻿#include "MySocketServerDlg.h"
+#include "MySocketServerDlg.h"
 
 
 MySocketServer::MySocketServer(QWidget *parent)

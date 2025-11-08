@@ -1,4 +1,4 @@
-﻿#include "customsplashscreen.h"
+#include "customsplashscreen.h"
 
 #include <QPixmap>
 #include <QThread>

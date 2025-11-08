@@ -12,5 +12,6 @@ protected:
 	virtual void initializeGL() override;
 	virtual void resizeGL(int w, int h) override;
 	virtual void paintGL() override;
-
+	unsigned int VBO, VAO=0;
+	unsigned int shaderProgram=0;
 };

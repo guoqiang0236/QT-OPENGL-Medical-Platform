@@ -1,4 +1,4 @@
-﻿#include "MyThread.h"
+#include "MyThread.h"
 
 std::atomic<int> MyThread::activeThreadCount{ 0 };
 

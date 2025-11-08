@@ -1,4 +1,4 @@
-﻿#include "MainWindow.h"
+#include "MainWindow.h"
 // 移除不存在的头文件
 #include <QDebug>
 #include <QIcon>

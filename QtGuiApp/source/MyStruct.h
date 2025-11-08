@@ -1,4 +1,4 @@
-﻿#include <QMetaType>
+#include <QMetaType>
 #include <QString>
 
 struct MyStruct

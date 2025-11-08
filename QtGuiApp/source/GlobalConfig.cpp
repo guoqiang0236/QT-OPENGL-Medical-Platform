@@ -1,4 +1,4 @@
-﻿#include "GlobalConfig.h"
+#include "GlobalConfig.h"
 #include <QGuiApplication>
 #include <QScreen>
 #include <QNetworkInterface>

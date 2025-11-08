@@ -1,4 +1,4 @@
-﻿#ifndef MED_IMG_MAINWINDOW_H
+#ifndef MED_IMG_MAINWINDOW_H
 #define MED_IMG_MAINWINDOW_H
 #include "pch.h"
 #include <QNetworkInterface>

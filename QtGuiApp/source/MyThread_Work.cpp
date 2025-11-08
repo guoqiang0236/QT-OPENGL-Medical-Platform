@@ -1,4 +1,4 @@
-﻿#include "MyThread_work.h"
+#include "MyThread_work.h"
 #include <QThread>
 #include <QDebug>
 MyThread_Work::MyThread_Work(QObject* parent)

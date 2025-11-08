@@ -1,4 +1,4 @@
-﻿#include "MyThread_QRunnable.h"
+#include "MyThread_QRunnable.h"
 #include <QThread>
 #include <QDebug>
 

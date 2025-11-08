@@ -1,4 +1,4 @@
-﻿#ifndef MYTHREAD_WORK_H
+#ifndef MYTHREAD_WORK_H
 #define MYTHREAD_WORK_H
 
 #include <Qobject>

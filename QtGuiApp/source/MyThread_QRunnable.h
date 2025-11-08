@@ -1,4 +1,4 @@
-﻿#ifndef MYTHREAD_RUNNABLE_H
+#ifndef MYTHREAD_RUNNABLE_H
 #define MYTHREAD_RUNNABLE_H
 
 #include <QObject>

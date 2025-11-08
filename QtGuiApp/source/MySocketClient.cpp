@@ -1,4 +1,4 @@
-﻿#include "MySocketClient.h"
+#include "MySocketClient.h"
 #include "MySocketClient-UI.h"
 #include <QMessageBox>
 #include <QNetworkProxy>

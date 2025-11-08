@@ -1,4 +1,4 @@
-﻿#ifndef MYSOCKETCLIENT_H
+#ifndef MYSOCKETCLIENT_H
 #define MYSOCKETCLIENT_H
 
 #include <QDialog>
