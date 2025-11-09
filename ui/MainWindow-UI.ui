@@ -635,7 +635,7 @@
   <customwidget>
    <class>MyOpenGLWidget</class>
    <extends>QOpenGLWidget</extends>
-   <header location="global">MyOpenGLWidget.h</header>
+   <header>opengl\MyOpenGLWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

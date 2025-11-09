@@ -9,7 +9,6 @@
 #ifndef MAINWINDOW_2D_UI_H
 #define MAINWINDOW_2D_UI_H
 
-#include <MyOpenGLWidget.h>
 #include <QtCore/QVariant>
 #include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
@@ -23,6 +22,7 @@
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+#include "opengl\MyOpenGLWidget.h"
 
 QT_BEGIN_NAMESPACE
 

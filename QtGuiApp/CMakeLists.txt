@@ -10,6 +10,7 @@ project(QtGuiApp LANGUAGES CXX)
 
 # 查找所需要的库
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets OpenGLWidgets Quick QuickWidgets)
+set (GLM_DIR "${CMAKE_SOURCE_DIR}/Packages/glm-1.0.1-light")
 
 # 启用 AUTOMOC（QT关键！）
 set(CMAKE_AUTOMOC ON)   # 自动运行 moc，处理 Q_OBJECT 宏，生成元对象代码（信号槽机制依赖）
@@ -17,10 +18,16 @@ set(CMAKE_AUTOUIC ON)   # 自动处理 .ui 文件，生成对应的界面代码
 set(CMAKE_AUTORCC ON)   # 自动处理 .qrc 资源文件，生成资源访问代码
 
 # 收集源文件（显式列出头文件）
-file(GLOB SRC_FILES CONFIGURE_DEPENDS
+file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS
     "source/*.cpp"
     "source/*.h"
 )
+
+foreach(FILE_PATH IN LISTS SRC_FILES)
+    file(RELATIVE_PATH REL_PATH "${CMAKE_CURRENT_SOURCE_DIR}" "${FILE_PATH}")
+    get_filename_component(FILE_DIR "${REL_PATH}" DIRECTORY)
+    source_group("${FILE_DIR}" FILES "${FILE_PATH}")
+endforeach()
 
 qt_add_resources(RESOURCES resources.qrc)
 
@@ -38,6 +45,7 @@ target_precompile_headers(QtGuiApp PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/source/p
 target_include_directories(QtGuiApp
     PRIVATE 
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${GLM_DIR}
 )
 
 # 库lib目录
