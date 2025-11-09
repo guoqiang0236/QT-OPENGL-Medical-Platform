@@ -105,3 +105,77 @@ void MyOpenGLWidget::paintGL()
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
+
+void MyOpenGLWidget::keyPressEvent(QKeyEvent* event)
+{
+	if (m_cameraControl)
+	{
+		// 1 表示按下，0 表示释放（你可以自定义，常用1=Press, 0=Release）
+		m_cameraControl->onKey(event->key(), 1, event->modifiers());
+	}
+	QOpenGLWidget::keyPressEvent(event); // 保留父类行为
+}
+
+void MyOpenGLWidget::keyReleaseEvent(QKeyEvent* event)
+{
+	if (m_cameraControl)
+	{
+		// 1 表示按下，0 表示释放（你可以自定义，常用1=Press, 0=Release）
+		m_cameraControl->onKey(event->key(), 0, event->modifiers());
+	}
+	QOpenGLWidget::keyPressEvent(event); // 保留父类行为
+}
+
+void MyOpenGLWidget::mousePressEvent(QMouseEvent* event)
+{
+	//qDebug() << "鼠标点击: 按钮" << event->button() << ", 按下";
+	if (m_cameraControl)
+	{
+		// 1 表示按下，0 表示释放（你可以自定义，常用1=Press, 0=Release）
+		m_cameraControl->onMouse(static_cast<int>(event->button()), 1, event->position().x(), event->position().y());
+	}
+	// 其他处理逻辑...
+	QOpenGLWidget::mousePressEvent(event); // 保留父类行为（可选）
+}
+
+void MyOpenGLWidget::mouseReleaseEvent(QMouseEvent* event)
+{
+	//qDebug() << "鼠标点击: 按钮" << event->button() << ", 松开";
+		// 其他处理逻辑...
+	if (m_cameraControl)
+	{
+		// 1 表示按下，0 表示释放（你可以自定义，常用1=Press, 0=Release）
+		m_cameraControl->onMouse(static_cast<int>(event->button()), 0, event->position().x(), event->position().y());
+	}
+	QOpenGLWidget::mouseReleaseEvent(event); // 保留父类行为（可选）
+}
+
+void MyOpenGLWidget::mouseMoveEvent(QMouseEvent* event)
+{
+	//qDebug() << "鼠标移动: 位置" << event->pos();
+		// 其他处理逻辑...
+	if (m_cameraControl)
+	{
+		// 1 表示按下，0 表示释放（你可以自定义，常用1=Press, 0=Release）
+		m_cameraControl->onCursor(event->position().x(), event->position().y());
+	}
+	QOpenGLWidget::mouseMoveEvent(event); // 保留父类行为（可选）
+}
+
+void MyOpenGLWidget::wheelEvent(QWheelEvent* event)
+{
+	//qDebug() << "鼠标滚轮: 角度" << event->angleDelta();
+		// 其他处理逻辑...
+	if (m_cameraControl)
+	{
+		// 传递滚轮滚动的距离，正值为向上，负值为向下
+		m_cameraControl->onScroll(event->angleDelta().y());
+	}
+	QOpenGLWidget::wheelEvent(event); // 保留父类行为（可选）
+}
+
+void MyOpenGLWidget::showEvent(QShowEvent* event)
+{
+	QOpenGLWidget::showEvent(event);
+	setFocus(Qt::OtherFocusReason); // 这里再次请求焦点
+}
