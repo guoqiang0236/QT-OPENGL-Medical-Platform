@@ -19,6 +19,7 @@ protected:
 	unsigned int VBO, VAO,EBO=0;
 
 public:
+	void switchTexture(const std::string& imagePath);
 	void paperrectangle();
 	void papershader(std::string vert, std::string frag);
 	void papaercamera();

@@ -64,6 +64,34 @@ void MyOpenGLWidget::paintGL()
 	update(); // 请求下一帧重绘
 }
 
+// ✨ 核心方法：运行时切换纹理
+void MyOpenGLWidget::switchTexture(const std::string& imagePath)
+{
+	// 在 OpenGL 线程中执行
+	makeCurrent();
+
+	qDebug() << "[切换纹理] 新路径:" << QString::fromStdString(imagePath);
+
+	// 加载新纹理
+	Texture* newTexture = Texture::createTexture(imagePath, 0);
+
+	if (!newTexture) {
+		qDebug() << "ERROR: 新纹理加载失败:" << QString::fromStdString(imagePath);
+		doneCurrent();
+		return;
+	}
+
+	// 替换旧纹理
+	m_texture = newTexture;
+
+	qDebug() << "SUCCESS: 纹理切换完成! 新尺寸:" << m_texture->getWidth() << "x" << m_texture->getHeight();
+
+	// 触发重绘
+	update();
+
+	doneCurrent();
+}
+
 void MyOpenGLWidget::paperrectangle()
 {
 	// 顶点数据
