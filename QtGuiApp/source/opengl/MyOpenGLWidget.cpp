@@ -12,8 +12,9 @@ void MyOpenGLWidget::initializeGL()
 {
 	initializeOpenGLFunctions();
 	paperrectangle();
-	papershader("../assets/shaders/rectangle.vert", "../assets/shaders/rectangle.frag");
+	papershader("../assets/shaders/rectangle_image.vert", "../assets/shaders/rectangle_image.frag");
 	papaercamera();
+	loadTexture(R"(..\assets\textures\liu.jpg)");
 }
 
 void MyOpenGLWidget::resizeGL(int w, int h)
@@ -23,9 +24,9 @@ void MyOpenGLWidget::resizeGL(int w, int h)
 
 void MyOpenGLWidget::paintGL()
 {
-	glClearColor(0.2f, 0.3f, 0.32f, 1.0f); //set方法【重点】如果没有 initializeGL，目前是一个空指针状态，没有指向显卡里面的函数，会报错
+	glClearColor(0.2f, 0.3f, 0.32f, 1.0f); 
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT); // use方法
-	if (m_Shader && m_camera)
+	if (m_Shader && m_camera && m_texture)
 	{
 		m_Shader->begin();
 
@@ -43,9 +44,13 @@ void MyOpenGLWidget::paintGL()
 		// 设置 Projection 矩阵（透视投影）
 		glm::mat4 projection = m_camera->getProjectionMatrix();
 		m_Shader->setMatrix4x4("projection", projection);
+		
+		m_texture->bind();
+		m_Shader->setInt("imageTexture", 0); // 纹理单元 0
 
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		// 参数：绘制模式、索引数量、索引数据类型、索引缓冲偏移
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		m_Shader->end();
 	}
@@ -62,28 +67,47 @@ void MyOpenGLWidget::paintGL()
 void MyOpenGLWidget::paperrectangle()
 {
 	// 顶点数据
-	float vertices[] = {
-		// 第一个三角形
-		-0.5f, -0.5f, 0.0f,  // 左下
-		 0.5f, -0.5f, 0.0f,  // 右下
-		-0.5f,  0.5f, 0.0f,  // 左上
-		// 第二个三角形
-		-0.5f,  0.5f, 0.0f,  // 左上
-		 0.5f, -0.5f, 0.0f,  // 右下
-		 0.5f,  0.5f, 0.0f   // 右上
+	// 交错存储：位置(3 float) + UV(2 float) = 5 float 每顶点
+	std::vector<float> vertices = {
+		// 位置 (x, y, z)      // UV (u, v)
+		-0.5f, -0.5f, 0.0f,    0.0f, 0.0f,   // 顶点 0：左下
+		 0.5f, -0.5f, 0.0f,    1.0f, 0.0f,   // 顶点 1：右下
+		 0.5f,  0.5f, 0.0f,    1.0f, 1.0f,   // 顶点 2：右上
+		-0.5f,  0.5f, 0.0f,    0.0f, 1.0f    // 顶点 3：左上
 	};
+	// 索引数据（两个三角形，6 个索引）
+	std::vector<unsigned int> indices = {
+		0, 1, 2, 
+		0, 2, 3  
+	};
+	// 创建 VBO
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
+	// 创建 EBO（索引缓冲）
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+
+	// 创建 VAO
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
+	// 绑定 VBO
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glEnableVertexArrayAttrib(VAO, 0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	// 位置属性（location 0）
+	glEnableVertexArrayAttrib(VAO, 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	
+	// UV 属性（location 1）
+	glEnableVertexArrayAttrib(VAO, 1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+
+	// 绑定 EBO 到 VAO（重要！）
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
 	glBindVertexArray(0);
 }
 
@@ -101,6 +125,14 @@ void MyOpenGLWidget::papaercamera()
 	// 创建相机控制器
 	m_cameraControl = new CameraControl();
 	m_cameraControl->setcamera(m_camera);
+}
+
+void MyOpenGLWidget::loadTexture(const std::string& imagePath)
+{
+	m_texture = Texture::createTexture(imagePath, 0);
+	if (!m_texture) {
+		qDebug() << "纹理加载失败:" << QString::fromStdString(imagePath);
+	}
 }
 
 void MyOpenGLWidget::keyPressEvent(QKeyEvent* event)

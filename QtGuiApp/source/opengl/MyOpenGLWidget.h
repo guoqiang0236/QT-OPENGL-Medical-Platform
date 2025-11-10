@@ -4,6 +4,8 @@
 #include "../camera/Camera.h"
 #include "../camera/CameraControl.h"
 #include "Shader.h"
+#include "Texture.h"
+
 class MyOpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_5_Core
 {
 	Q_OBJECT
@@ -14,12 +16,13 @@ protected:
 	virtual void initializeGL() override;
 	virtual void resizeGL(int w, int h) override;
 	virtual void paintGL() override;
-	unsigned int VBO, VAO=0;
+	unsigned int VBO, VAO,EBO=0;
 
 public:
 	void paperrectangle();
 	void papershader(std::string vert, std::string frag);
 	void papaercamera();
+	void loadTexture(const std::string& imagePath);
 protected:
 	void keyPressEvent(QKeyEvent* event) override;       // 对应键盘按下
 	void keyReleaseEvent(QKeyEvent* event) override;     // 对应键盘释放
@@ -37,6 +40,9 @@ private:
 	//摄像机
 	Camera* m_camera = nullptr; // 透视摄像机
 	CameraControl* m_cameraControl = nullptr; // 摄像机控制器
+
+	// 纹理
+	Texture* m_texture = nullptr;
 
 	float m_rotationAngle = 0.0f;  // 添加旋转角度变量
 };
