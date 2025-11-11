@@ -26,7 +26,20 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets OpenGLWidgets Quick QuickW
 set (GLM_DIR "${CMAKE_SOURCE_DIR}/Packages/glm-1.0.1-light")
 set (OpenCV_DIR "${CMAKE_SOURCE_DIR}/Packages/OpenCV4100")
 find_package(OpenCV REQUIRED)
-
+set(DCMTK_ROOT ${CMAKE_SOURCE_DIR}/Packages/DCMTK3.6.9)
+set(DCMTK_LIBS
+    iphlpapi
+    ws2_32
+    wsock32
+    netapi32
+    ofstd
+    oflog
+    dcmdata
+    dcmnet  
+    dcmimage  
+    dcmimgle 
+    i2d   
+)
 # 启用 AUTOMOC（QT关键！）
 set(CMAKE_AUTOMOC ON)   # 自动运行 moc，处理 Q_OBJECT 宏，生成元对象代码（信号槽机制依赖）
 set(CMAKE_AUTOUIC ON)   # 自动处理 .ui 文件，生成对应的界面代码
@@ -62,6 +75,7 @@ target_include_directories(QtGuiApp
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${OpenCV_INCLUDE_DIRS}
         ${GLM_DIR}
+        ${DCMTK_ROOT}/include
 )
 
 # 库lib目录
@@ -69,6 +83,7 @@ target_link_directories(QtGuiApp
     PRIVATE
         "${CMAKE_SOURCE_DIR}/lib"
         ${OpenCV_LIB_DIR}
+        ${DCMTK_ROOT}/lib
 )
 
 # 链接lib库
@@ -80,6 +95,7 @@ target_link_libraries(QtGuiApp PRIVATE
     Qt6::Quick
     Qt6::QuickWidgets
      ${OpenCV_LIBS}
+     ${DCMTK_LIBS}
 )
 
 # 确保 MSVC 编译器以 UTF-8 方式读取源文件

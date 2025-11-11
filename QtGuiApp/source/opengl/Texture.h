@@ -36,7 +36,7 @@ public:
 	int getHeight()const { return mHeight; }
 	GLuint getTexture()const { return mTexture; }
 
-private:
+protected:
 	GLuint mTexture{ 0 };
 	int mWidth{ 0 };
 	int mHeight{ 0 };
