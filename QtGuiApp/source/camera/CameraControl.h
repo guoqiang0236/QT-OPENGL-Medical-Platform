@@ -39,5 +39,5 @@ protected:
     Camera* mCamera = nullptr;
 
     // 6. 记录相机缩放的速度
-    float mScaleSpeed = 1.0f; // 缩放速度
+    float mScaleSpeed = 0.01f; // 缩放速度
 };

@@ -19,14 +19,16 @@ public:
     ~MainWindow();
 
 
- 
+protected:
+	void dragEnterEvent(QDragEnterEvent* event) override;
+	void dropEvent(QDropEvent* event) override;
 
 private slots:
     void StyleChanged(const QString& style);
     void ShutDown();
     void Change_CurrentTime();
 	void ProgressChanged(int value, int max); // 进度条更新
-
+    void OpenImg();
  
     
     void Freeze();

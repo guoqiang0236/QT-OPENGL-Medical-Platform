@@ -1,1 +1,5 @@
-IDI_ICON1 ICON DISCARDABLE "favicon.ico"
+#include <windows.h>
+
+// 定义图标资源
+IDI_ICON1 ICON "logo.ico"
+

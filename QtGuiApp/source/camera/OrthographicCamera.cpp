@@ -24,7 +24,7 @@ glm::mat4 OrthographicCamera::getProjectionMatrix()
 
 void OrthographicCamera::scale(float deltaScale)
 {
-	mScaleFactor += deltaScale;
+	mScaleFactor -= deltaScale;
 }
 
 

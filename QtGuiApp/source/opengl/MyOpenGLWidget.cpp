@@ -1,5 +1,8 @@
 #include "MyOpenGLWidget.h"
 #include "../camera/PerspectiveCamera.h"
+#include "../camera/TrackBallCameraControl.h"
+#include "../camera/OrthographicCamera.h"
+#include "../camera/GameCameraControl.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -14,7 +17,6 @@ void MyOpenGLWidget::initializeGL()
 	paperrectangle();
 	papershader("../assets/shaders/rectangle_image.vert", "../assets/shaders/rectangle_image.frag");
 	papaercamera();
-	loadTexture(R"(..\assets\textures\liu.jpg)");
 }
 
 void MyOpenGLWidget::resizeGL(int w, int h)
@@ -24,7 +26,7 @@ void MyOpenGLWidget::resizeGL(int w, int h)
 
 void MyOpenGLWidget::paintGL()
 {
-	glClearColor(0.2f, 0.3f, 0.32f, 1.0f); 
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); 
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT); // use方法
 	if (m_Shader && m_camera && m_texture)
 	{
@@ -56,10 +58,10 @@ void MyOpenGLWidget::paintGL()
 	}
 
 	// 更新旋转角度
-	m_rotationAngle += 1.0f;
+	/*m_rotationAngle += 1.0f;
 	if (m_rotationAngle >= 360.0f) {
 		m_rotationAngle = 0.0f;
-	}
+	}*/
 
 	update(); // 请求下一帧重绘
 }
@@ -148,10 +150,24 @@ void MyOpenGLWidget::papershader(std::string vert, std::string frag)
 void MyOpenGLWidget::papaercamera()
 {
 	// 创建透视相机：视场角 45度，宽高比 800/600，近平面 0.1，远平面 100
-	m_camera = new PerspectiveCamera(45.0f, 800.0f / 600.0f, 0.1f, 100.0f);
+	//m_camera = new PerspectiveCamera(30.0f, 800.0f / 500.0f, 0.0001f, 100.0f);
+	// 动态计算宽高比
+	float aspect = static_cast<float>(width()) / static_cast<float>(height());
 
+	// 创建正交相机 - 无透视变形,完美显示2D图像
+	m_camera = new OrthographicCamera(
+		-aspect,  // 根据窗口宽高比调整左右边界
+		aspect,
+		1.0f,     // 固定上下边界
+		-1.0f,
+		0.1f,     // 近平面
+		100.0f    // 远平面
+	);
+
+	// 相机位置
+	m_camera->mPosition = glm::vec3(0.0f, 0.0f, 1.0f);
 	// 创建相机控制器
-	m_cameraControl = new CameraControl();
+	m_cameraControl = new TrackBallCameraControl();
 	m_cameraControl->setcamera(m_camera);
 }
 

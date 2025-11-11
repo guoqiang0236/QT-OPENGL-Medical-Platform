@@ -13,5 +13,6 @@
         <file>res/QSS/Ubuntu.qss</file>
         <file>res/icon/favicon.ico</file>
         <file>res/picture/loading.jpg</file>
+        <file>res/icon/logo.ico</file>
     </qresource>
 </RCC>

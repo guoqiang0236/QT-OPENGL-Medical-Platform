@@ -14,6 +14,10 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonValue>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QMimeData>
+#include <QFileInfo>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent),
@@ -29,11 +33,12 @@ MainWindow::MainWindow(QWidget* parent)
 	m_socketClient = new MySocketClient(this);
 	m_tcpSocket = new QTcpSocket(this);
     //setWindowFlags(Qt::FramelessWindowHint);
-    setWindowIcon(QIcon(":/res/icon/favicon.ico")); // 覆盖可能的默认值
+   
     m_ui->setupUi(this);
+    UpdateGUI();
     InitSlots();
     UpdateSize();
-    UpdateGUI();
+    
     InitThread();
 }
 
@@ -55,6 +60,61 @@ MainWindow::~MainWindow()
             m_numsub->wait();
         }
     }
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent* event)
+{
+    if (event->mimeData()->hasUrls())
+    {
+		QList<QUrl> urls = event->mimeData()->urls();
+        if (!urls.isEmpty())
+        {
+            QString filePath = urls.first().toLocalFile();
+            QFileInfo fileInfo(filePath);
+            QString suffix = fileInfo.suffix().toLower();
+            // 检查文件类型是否符合要求
+            if (suffix == "png" || suffix == "jpg" || suffix == "bmp" || suffix == "dcm")
+            {
+                event->acceptProposedAction(); 
+                return;
+			}
+        }
+    }
+
+    event->ignore();
+}
+
+void MainWindow::dropEvent(QDropEvent* event)
+{
+
+    if (event->mimeData()->hasUrls())
+    {
+        QList<QUrl> urls = event->mimeData()->urls();
+        if (!urls.isEmpty())
+        {
+            QString filePath = urls.first().toLocalFile();
+            QFileInfo fileInfo(filePath);
+
+            // 验证文件格式
+            QString suffix = fileInfo.suffix().toLower();
+            if (suffix == "png" || suffix == "jpg" || suffix == "jpeg" ||
+                suffix == "bmp" || suffix == "dcm")
+            {
+                qDebug() << "成功拖放图片:" << filePath;
+                std::string imagePath = std::string(filePath.toLocal8Bit());
+                if(m_ui->openGLWidget)
+                    m_ui->openGLWidget->switchTexture(imagePath);
+                event->acceptProposedAction();
+                return;
+            }
+            else
+            {
+                qWarning() << "不支持的文件格式:" << suffix;
+            }
+        }
+    }
+
+    event->ignore();
 }
 
 ;
@@ -94,6 +154,21 @@ void MainWindow::ProgressChanged(int value, int max)
 		m_progressDialog->setMaximumValue(max);
 		m_progressDialog->setLabelText(QString("正在处理... %1/%2").arg(value).arg(max));
 		qApp->processEvents();
+	}
+}
+
+void MainWindow::OpenImg()
+{
+	QString ImgsDir = QCoreApplication::applicationDirPath()+"/../../QtGuiApp/assets/textures";
+	QDir dir(ImgsDir);
+    QString initialDir = dir.absolutePath();
+
+	QString imagePathQ = QFileDialog::getOpenFileName(this, "选择图像文件", initialDir, "图像文件 (*.png *.jpg *.bmp *.dcm)");
+    
+    if(!imagePathQ.isEmpty())
+    {
+		std::string imagePath =  std::string(imagePathQ.toLocal8Bit());
+		m_ui->openGLWidget->switchTexture(imagePath);
 	}
 }
 
@@ -140,7 +215,8 @@ void MainWindow::InitSlots()
     
     connect(m_ui->comboBox, &QComboBox::currentTextChanged, this, &MainWindow::StyleChanged);
     connect(m_ui->pushButton_shutdown, &QPushButton::clicked, this, &MainWindow::ShutDown);
-  
+    
+	connect(m_ui->pushButton_openimg, &QPushButton::clicked, this, &MainWindow::OpenImg);
     
     
 
@@ -153,9 +229,10 @@ void MainWindow::UpdateGUI()
 {
     if (!m_ui )
         return;
-	m_ui->label_hospital->setText("上海泊维胜科技有限公司");
-    m_ui->comboBox->setCurrentIndex(8);
-
+	m_ui->label_hospital->setText("二维图渲染demo");
+    m_ui->comboBox->setCurrentIndex(2);
+    setWindowIcon(QIcon(":/res/icon/logo.ico")); // 覆盖可能的默认值
+    setWindowTitle("上海泊维胜科技有限公司");
 
 }
 

@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
     //CustomSplashScreen loadingflash;
     //loadingflash.init();
     // 加载样式表
-    QFile qss(":/res/QSS/MacOS.qss");
+    QFile qss(":/res/QSS/Aqua.qss");
     if (qss.open(QFile::ReadOnly)) {
         app.setStyleSheet(qss.readAll());
         qss.close();
