@@ -43,7 +43,8 @@ bool DicomTexture::loadFromDicomReader(DicomImageReader* reader)
     glBindTexture(GL_TEXTURE_2D, mTexture);
 
     // 上传 DICOM 数据（已经是 RGBA 格式）
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mWidth, mHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelData);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE16, img_width, img_height, 0, GL_LUMINANCE, GL_UNSIGNED_SHORT, pData);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE16, mWidth, mHeight, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixelData);
 
     // 生成 Mipmap
     glGenerateMipmap(GL_TEXTURE_2D);

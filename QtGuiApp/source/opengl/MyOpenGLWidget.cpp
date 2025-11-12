@@ -3,6 +3,7 @@
 #include "../camera/TrackBallCameraControl.h"
 #include "../camera/OrthographicCamera.h"
 #include "../camera/GameCameraControl.h"
+#include "../camera/Camera2DControl.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -167,7 +168,7 @@ void MyOpenGLWidget::papaercamera()
 	// 相机位置
 	m_camera->mPosition = glm::vec3(0.0f, 0.0f, 1.0f);
 	// 创建相机控制器
-	m_cameraControl = new TrackBallCameraControl();
+	m_cameraControl = new Camera2DControl();
 	m_cameraControl->setcamera(m_camera);
 }
 

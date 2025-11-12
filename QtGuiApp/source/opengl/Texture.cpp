@@ -1,4 +1,5 @@
 ﻿#include "Texture.h"
+#include "DicomTexture.h"
 #include <opencv2/opencv.hpp>
 
 std::map<std::string, Texture*> Texture::mTextureCache;
@@ -66,7 +67,7 @@ Texture::Texture(const std::string& path, unsigned int unit)
 
     //4 设置纹理的过滤方式
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     //用mipmap
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
     //*****重要*****//
@@ -204,8 +205,21 @@ Texture* Texture::createTexture(const std::string& path, unsigned int unit)
         //对于iterater, first->key, second->value
         return iter->second;
     }
-    //2 如果本路径对应的texture没有生成过,则重新生成
-    auto texture = new Texture(path, unit);
+    //2 ✅ 检查文件扩展名，判断是否为 DICOM 文件
+    std::string extension = path.substr(path.find_last_of(".") + 1);
+    std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+
+    Texture* texture = nullptr;
+
+    if (extension == "dcm") {
+        // 使用 DicomTexture 加载 DICOM 文件
+        qDebug() << "🔬 检测到 DICOM 文件，使用 DicomTexture 加载";
+        texture = new DicomTexture(path, unit);
+    }
+    else {
+        // 使用普通 Texture 加载图片
+        texture = new Texture(path, unit);
+    }
     mTextureCache[path] = texture;
     return texture;
 }
