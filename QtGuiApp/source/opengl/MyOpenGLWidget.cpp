@@ -6,6 +6,7 @@
 #include "../camera/Camera2DControl.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "DicomTexture.h"
 
 
 MyOpenGLWidget::MyOpenGLWidget(QWidget* parent):QOpenGLWidget(parent)
@@ -16,7 +17,7 @@ void MyOpenGLWidget::initializeGL()
 {
 	initializeOpenGLFunctions();
 	paperrectangle();
-	papershader("../assets/shaders/rectangle_image.vert", "../assets/shaders/rectangle_image.frag");
+	papershader("../assets/shaders/dicom.vert", "../assets/shaders/dicom.frag");
 	papaercamera();
 }
 
@@ -48,6 +49,18 @@ void MyOpenGLWidget::paintGL()
 		glm::mat4 projection = m_camera->getProjectionMatrix();
 		m_Shader->setMatrix4x4("projection", projection);
 		
+		DicomTexture* dicomTexture = dynamic_cast<DicomTexture*>(m_texture);
+		if (dicomTexture) {
+			float minVal = dicomTexture->getMinPixelValue();
+			float maxVal = dicomTexture->getMaxPixelValue();
+
+			m_Shader->setFloat("minPixelValue", minVal);
+			m_Shader->setFloat("maxPixelValue", maxVal);
+
+			qDebug() << "📊 传递给着色器: min=" << minVal << " max=" << maxVal;
+		}
+
+
 		m_texture->bind();
 		m_Shader->setInt("imageTexture", 0); // 纹理单元 0
 

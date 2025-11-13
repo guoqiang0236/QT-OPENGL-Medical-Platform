@@ -20,6 +20,15 @@ public:
     std::string getStudyDate() const;
     std::string getModality() const;
 
+    // ✅ 添加：获取像素范围
+    float getMinPixelValue() const { return mMinPixelValue; }
+    float getMaxPixelValue() const { return mMaxPixelValue; }
+
+
 private:
     std::unique_ptr<DicomImageReader> mDicomReader;
+
+    // ✅ 新增：存储像素值范围
+    float mMinPixelValue{ 0.0f };
+    float mMaxPixelValue{ 65535.0f };
 };

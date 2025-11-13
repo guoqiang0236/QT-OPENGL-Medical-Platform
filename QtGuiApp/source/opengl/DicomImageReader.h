@@ -18,8 +18,8 @@ public:
     // 加载 DICOM 文件
     bool loadDicomFile(const std::string& filePath);
 
-    // 获取图像数据（转换为 RGBA 格式）
-    unsigned char* getPixelData();
+    // 获取图像数据
+    const Uint16* getPixelData() const { return mPixelData; }
 
     // 获取图像尺寸
     int getWidth() const { return mWidth; }
@@ -38,16 +38,13 @@ public:
     // 释放资源
     void release();
 
-private:
-    // 内部方法
-    void convertToRGBA();
-    unsigned char mapValueToGray(double value);
+   
 
 private:
     std::unique_ptr<DicomImage> mDicomImage;
     std::unique_ptr<DcmFileFormat> mFileFormat;
 
-    std::vector<unsigned char> mPixelDataRGBA;
+    Uint16* mPixelData{ nullptr };
 
     int mWidth{ 0 };
     int mHeight{ 0 };

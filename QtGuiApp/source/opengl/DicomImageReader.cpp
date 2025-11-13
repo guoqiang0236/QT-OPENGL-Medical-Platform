@@ -47,7 +47,7 @@ bool DicomImageReader::loadDicomFile(const std::string& filePath)
     qDebug() << "   患者:" << QString::fromStdString(getPatientName());
     qDebug() << "   检查日期:" << QString::fromStdString(getStudyDate());
 
-    // 4. ✅ 修复：从 DICOM 数据集中读取窗宽窗位
+    // 4. 从 DICOM 数据集中读取窗宽窗位
     DcmDataset* dataset = mFileFormat->getDataset();
 
     // 尝试读取窗宽
@@ -67,21 +67,17 @@ bool DicomImageReader::loadDicomFile(const std::string& filePath)
         double minValue = 0.0;
         double maxValue = 0.0;
 
-        // 使用 getMinMaxValues() 获取最小最大值
         if (mDicomImage->getMinMaxValues(minValue, maxValue) != 0) {
             mWindowCenter = (maxValue + minValue) / 2.0;
             mWindowWidth = maxValue - minValue;
             qDebug() << "   使用计算的窗宽窗位";
         }
         else {
-            // 如果仍然失败，使用默认值
             qWarning() << "⚠️ 无法获取窗宽窗位，使用默认值";
-
-            // 根据模态使用不同的默认值
             std::string modality = getModality();
             if (modality == "CT") {
-                mWindowCenter = 40.0;   // CT 软组织窗位
-                mWindowWidth = 400.0;   // CT 软组织窗宽
+                mWindowCenter = 40.0;
+                mWindowWidth = 400.0;
             }
             else if (modality == "MR") {
                 mWindowCenter = 128.0;
@@ -97,79 +93,21 @@ bool DicomImageReader::loadDicomFile(const std::string& filePath)
     qDebug() << "   窗宽:" << mWindowWidth << " 窗位:" << mWindowCenter;
     qDebug() << "   模态:" << QString::fromStdString(getModality());
 
-    // 5. 转换为 RGBA
-    convertToRGBA();
+    // ✅ 5. 获取原始像素数据并存储为成员变量
+    mPixelData = (Uint16*)mDicomImage->getOutputData(16);
+    if (!mPixelData) {
+        qDebug() << "❌ 无法获取像素数据";
+        return false;
+    }
+
+    qDebug() << "✅ 原始像素数据已加载到成员变量";
 
     mIsLoaded = true;
     return true;
 }
 
-void DicomImageReader::convertToRGBA()
-{
-    if (!mDicomImage) return;
 
-    // 1. 获取像素数据
-    const DiPixel* pixelData = mDicomImage->getInterData();
-    if (!pixelData) {
-        qDebug() << "❌ 无法获取像素数据";
-        return;
-    }
 
-    // 2. 分配 RGBA 缓冲区
-    size_t totalPixels = mWidth * mHeight;
-    mPixelDataRGBA.resize(totalPixels * 4);
-
-    // 3. 应用窗宽窗位并转换为 8 位灰度
-    const void* rawData = pixelData->getData();
-
-    double minValue = mWindowCenter - mWindowWidth / 2.0;
-    double maxValue = mWindowCenter + mWindowWidth / 2.0;
-
-    for (size_t i = 0; i < totalPixels; ++i) {
-        double pixelValue = 0.0;
-
-        // 根据位深读取像素值
-        if (mBitsPerPixel <= 16) {
-            const Uint16* data16 = static_cast<const Uint16*>(rawData);
-            pixelValue = static_cast<double>(data16[i]);
-        }
-        else {
-            const Uint8* data8 = static_cast<const Uint8*>(rawData);
-            pixelValue = static_cast<double>(data8[i]);
-        }
-
-        // 应用窗宽窗位
-        unsigned char grayValue = mapValueToGray(pixelValue);
-
-        // 转换为 RGBA（灰度图）
-        mPixelDataRGBA[i * 4 + 0] = grayValue; // R
-        mPixelDataRGBA[i * 4 + 1] = grayValue; // G
-        mPixelDataRGBA[i * 4 + 2] = grayValue; // B
-        mPixelDataRGBA[i * 4 + 3] = 255;       // A
-    }
-
-    qDebug() << "✅ DICOM 图像已转换为 RGBA 格式";
-}
-
-unsigned char DicomImageReader::mapValueToGray(double value)
-{
-    double minValue = mWindowCenter - mWindowWidth / 2.0;
-    double maxValue = mWindowCenter + mWindowWidth / 2.0;
-
-    // 窗宽窗位映射
-    if (value <= minValue) return 0;
-    if (value >= maxValue) return 255;
-
-    // 线性映射到 0-255
-    double normalized = (value - minValue) / (maxValue - minValue);
-    return static_cast<unsigned char>(normalized * 255.0);
-}
-
-unsigned char* DicomImageReader::getPixelData()
-{
-    if (mPixelDataRGBA.empty()) return nullptr;
-    return mPixelDataRGBA.data();
-}
 
 std::string DicomImageReader::getPatientName() const
 {
@@ -203,9 +141,6 @@ void DicomImageReader::setWindowLevel(double center, double width)
     mWindowCenter = center;
     mWindowWidth = width;
 
-    // 重新应用窗宽窗位
-    convertToRGBA();
-
     qDebug() << "🔧 窗宽窗位已更新: 窗宽=" << mWindowWidth << " 窗位=" << mWindowCenter;
 }
 
@@ -219,6 +154,6 @@ void DicomImageReader::release()
 {
     mDicomImage.reset();
     mFileFormat.reset();
-    mPixelDataRGBA.clear();
+    mPixelData = nullptr;
     mIsLoaded = false;
 }
