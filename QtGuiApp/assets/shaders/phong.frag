@@ -47,9 +47,9 @@ struct SpotLight{
 };
 
 uniform DirectionalLight MydirectionalLight;
-uniform SpotLight MySpotLight;
+uniform SpotLight SpotLight;
 #define PointLight_NUM 4
-uniform PointLight MyPointLight[PointLight_NUM];
+uniform PointLight PointLight[PointLight_NUM];
 
 //计算漫反射光照
 vec3 calculateDiffuse(vec3 lightColor, vec3 objectColor, vec3 lightDir, vec3 normal){
@@ -140,12 +140,12 @@ void main()
 	vec3 normalN = normalize(normal);
 	vec3 viewDir = normalize(worldPosition - cameraPosition);
 
-	//result += calculateSpotLight(MySpotLight, normalN, viewDir);
+	//result += calculateSpotLight(SpotLight, normalN, viewDir);
 	result += calculateDirectionalLight(MydirectionalLight,normalN, viewDir);
 
 //	for(int i =0;i<PointLight_NUM;i++)
 //	{
-//		result += calculatePointLight(MyPointLight[i],normalN, viewDir);
+//		result += calculatePointLight(PointLight[i],normalN, viewDir);
 //	}
 
 	//环境光计算 

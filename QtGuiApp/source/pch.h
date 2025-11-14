@@ -30,8 +30,13 @@
 #include "MyThread_QRunnable.h"
 #include "MyProgressDialog.h"
 
+//opengl
+#include <QOpenGLWidget>
+#include <QOpenGLFunctions_4_5_Core>
 
-
+//glm
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_transform.hpp>
 //全局变量
 #include "GlobalConfig.h"
 
