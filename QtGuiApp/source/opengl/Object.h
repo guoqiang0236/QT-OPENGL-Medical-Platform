@@ -12,61 +12,61 @@ enum class ObjectType {
 class Object :public QObject, protected QOpenGLFunctions_4_5_Core {
     Q_OBJECT
 public:
-    // ¹¹Ôìº¯Êı
+    // æ„é€ å‡½æ•°
     Object();
     ~Object();
 
-    // ÉèÖÃÎïÌåÎ»ÖÃ
+    // è®¾ç½®ç‰©ä½“ä½ç½®
     void setPosition(glm::vec3 pos);
 
-    // ÔöÁ¿Ğı×ª·½·¨
+    // å¢é‡æ—‹è½¬æ–¹æ³•
     void rotateX(float angle);
     void rotateY(float angle);
     void rotateZ(float angle);
 
-    // ÉèÖÃ½Ç¶È·½·¨
+    // è®¾ç½®è§’åº¦æ–¹æ³•
     void setAngleX(float angle);
     void setAngleY(float angle);
     void setAngleZ(float angle);
 
-    // ÉèÖÃËõ·Å±ÈÀı
+    // è®¾ç½®ç¼©æ”¾æ¯”ä¾‹
     void setScale(glm::vec3 scale);
 
-    // »ñÈ¡Ä£ĞÍ±ä»»¾ØÕó
+    // è·å–æ¨¡å‹å˜æ¢çŸ©é˜µ
     glm::mat4 getModelMatrix()const;
 
     glm::vec3 getPosition()const { return m_Position; }
 
-    //¸¸×Ó¹ØÏµ
-    void addChild(Object* obj);             // Ìí¼Ó×Ó¶ÔÏó
-    std::vector<Object*> getChildren();     // »ñÈ¡ËùÓĞ×Ó¶ÔÏó
-    Object* getParent();                    // »ñÈ¡¸¸¶ÔÏóÖ¸Õë
+    //çˆ¶å­å…³ç³»
+    void addChild(Object* obj);             // æ·»åŠ å­å¯¹è±¡
+    std::vector<Object*> getChildren();     // è·å–æ‰€æœ‰å­å¯¹è±¡
+    Object* getParent();                    // è·å–çˆ¶å¯¹è±¡æŒ‡é’ˆ
 
     ObjectType getType()const { return m_Type; }
 
-    //¿ØÖÆÏÔÊ¾
+    //æ§åˆ¶æ˜¾ç¤º
 	void setShow(bool show) { bshow = show; }
 	bool getShow() const { return bshow; }
 protected:
-    //ÊÇ·ñÏÔÊ¾
+    //æ˜¯å¦æ˜¾ç¤º
     bool bshow{ true };
-    // ³ÉÔ±±äÁ¿£¨Óë½ØÍ¼ÍêÈ«Ò»ÖÂ£©
-    glm::vec3 m_Position{ 0.0f };  // ÎïÌåÎ»ÖÃ
+    // æˆå‘˜å˜é‡ï¼ˆä¸æˆªå›¾å®Œå…¨ä¸€è‡´ï¼‰
+    glm::vec3 m_Position{ 0.0f };  // ç‰©ä½“ä½ç½®
 
 
-    // unityĞı×ª±ê×¼£ºpitch yaw roll
-    float m_AngleX{ 0.0f };        // XÖáĞı×ª½Ç¶È£¨»¡¶È£©
-    float m_AngleY{ 0.0f };        // YÖáĞı×ª½Ç¶È£¨»¡¶È£©
-    float m_AngleZ{ 0.0f };        // ZÖáĞı×ª½Ç¶È£¨»¡¶È£©
+    // unityæ—‹è½¬æ ‡å‡†ï¼špitch yaw roll
+    float m_AngleX{ 0.0f };        // Xè½´æ—‹è½¬è§’åº¦ï¼ˆå¼§åº¦ï¼‰
+    float m_AngleY{ 0.0f };        // Yè½´æ—‹è½¬è§’åº¦ï¼ˆå¼§åº¦ï¼‰
+    float m_AngleZ{ 0.0f };        // Zè½´æ—‹è½¬è§’åº¦ï¼ˆå¼§åº¦ï¼‰
 
 
     glm::vec3 m_Scale{ 1.0f };
 
-    //¸¸×Ó¹ØÏµ
-    std::vector<Object*> m_Children; // ×ÓÎïÌåÁĞ±í
-    Object* m_Parent{ nullptr }; // ¸¸ÎïÌåÖ¸Õë
+    //çˆ¶å­å…³ç³»
+    std::vector<Object*> m_Children; // å­ç‰©ä½“åˆ—è¡¨
+    Object* m_Parent{ nullptr }; // çˆ¶ç‰©ä½“æŒ‡é’ˆ
 
-    //ÀàĞÍ¼ÇÂ¼
+    //ç±»å‹è®°å½•
     ObjectType m_Type;
 
        

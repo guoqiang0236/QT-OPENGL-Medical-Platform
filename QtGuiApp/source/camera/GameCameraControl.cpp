@@ -27,56 +27,56 @@ void GameCameraControl::onCursor(double xpos, double ypos)
 
 void GameCameraControl::rotatePitch(float angle)
 {
-    // 0. ÅÐ¶Ï
+    // 0. åˆ¤æ–­
     mPitch += angle;
-    if (mPitch > 89.0f || mPitch < -89.0f) // ÏÞÖÆ¸©Ñö½Ç
+    if (mPitch > 89.0f || mPitch < -89.0f) // é™åˆ¶ä¿¯ä»°è§’
     {
         mPitch -= angle;
         return;
     }
-    // 1. ÈÆ×ÅmRightÏòÁ¿Ðý×ª
+    // 1. ç»•ç€mRightå‘é‡æ—‹è½¬
     auto mat = glm::rotate(glm::mat4(1.0f), glm::radians(angle), mCamera->mRight);
 
-    // 2. Ó°Ïìµ±Ç°Ïà»úµÄupÏòÁ¿
-    mCamera->mUp = mat * glm::vec4(mCamera->mUp, 0.0f); // vec4¸øµ½vec3£¬×Ô¶¯È¡xyz 
+    // 2. å½±å“å½“å‰ç›¸æœºçš„upå‘é‡
+    mCamera->mUp = mat * glm::vec4(mCamera->mUp, 0.0f); // vec4ç»™åˆ°vec3ï¼Œè‡ªåŠ¨å–xyz 
 
 }
 
 void GameCameraControl::rotateYaw(float angle)
 {
-    //ÈÆ×ÅÊÀ½ç×ø±êÏµµÄYÖáÐý×ª
+    //ç»•ç€ä¸–ç•Œåæ ‡ç³»çš„Yè½´æ—‹è½¬
     auto mat = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    // 2. Ó°Ïìµ±Ç°Ïà»úµÄupÏòÁ¿¡¢rightÏòÁ¿
-    mCamera->mRight = mat * glm::vec4(mCamera->mRight, 0.0f); // vec4¸øµ½vec3£¬×Ô¶¯È¡xyz
-    mCamera->mUp = mat * glm::vec4(mCamera->mUp, 0.0f); // vec4¸øµ½vec3£¬×Ô¶¯È¡xyz
+    // 2. å½±å“å½“å‰ç›¸æœºçš„upå‘é‡ã€rightå‘é‡
+    mCamera->mRight = mat * glm::vec4(mCamera->mRight, 0.0f); // vec4ç»™åˆ°vec3ï¼Œè‡ªåŠ¨å–xyz
+    mCamera->mUp = mat * glm::vec4(mCamera->mUp, 0.0f); // vec4ç»™åˆ°vec3ï¼Œè‡ªåŠ¨å–xyz
 
 }
 
 void GameCameraControl::update()
 {
-    // 1. ¼ÆËãÏà»úÇ°·½ÏòÁ¿£¨ÓÒÊÖ×ø±êÏµ£©
+    // 1. è®¡ç®—ç›¸æœºå‰æ–¹å‘é‡ï¼ˆå³æ‰‹åæ ‡ç³»ï¼‰
     auto front = glm::cross(mCamera->mUp, mCamera->mRight);
-    auto right = mCamera->mRight;  // Ö±½Ó»ñÈ¡Ïà»úÓÒÏòÁ¿
+    auto right = mCamera->mRight;  // ç›´æŽ¥èŽ·å–ç›¸æœºå³å‘é‡
 
-    // 2. ³õÊ¼»¯ÒÆ¶¯·½ÏòÏòÁ¿
+    // 2. åˆå§‹åŒ–ç§»åŠ¨æ–¹å‘å‘é‡
     glm::vec3 direction(0.0f);
 
-    // 3. ´¦Àí¼üÅÌÊäÈë£¨Qt ·½Ê½£©
+    // 3. å¤„ç†é”®ç›˜è¾“å…¥ï¼ˆQt æ–¹å¼ï¼‰
     if (mKeyMap[Qt::Key_W]) {
-        direction += front;  // Ç°½ø
+        direction += front;  // å‰è¿›
     }
     if (mKeyMap[Qt::Key_S]) {
-        direction -= front;  // ºóÍË
+        direction -= front;  // åŽé€€
     }
     if (mKeyMap[Qt::Key_A]) {
-        direction += right;  // ×óÒÆ
+        direction += right;  // å·¦ç§»
     }
     if (mKeyMap[Qt::Key_D]) {
-        direction -= right;  // ÓÒÒÆ
+        direction -= right;  // å³ç§»
     }
 
-    // 4. ±ê×¼»¯²¢Ó¦ÓÃÒÆ¶¯£¨Í¼Æ¬ÖÐÎ´Õ¹Ê¾µÄºóÐø´¦Àí£©
+    // 4. æ ‡å‡†åŒ–å¹¶åº”ç”¨ç§»åŠ¨ï¼ˆå›¾ç‰‡ä¸­æœªå±•ç¤ºçš„åŽç»­å¤„ç†ï¼‰
     if (glm::length(direction) != 0.0f) {
         direction = glm::normalize(direction);
         mCamera->mPosition += direction * mSpeed;

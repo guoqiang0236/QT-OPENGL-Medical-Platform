@@ -52,7 +52,7 @@ void Object::setScale(glm::vec3 scale)
 
 glm::mat4 Object::getModelMatrix()const
 {
-	//Ê×ÏÈ»ñÈ¡¸¸Ç×µÄ±ä»»¾ØÕó
+	//é¦–å…ˆè·å–çˆ¶äº²çš„å˜æ¢çŸ©é˜µ
 	glm::mat4 parentMatrix{ 1.0f };
 	if (m_Parent != nullptr)
 	{
@@ -60,31 +60,31 @@ glm::mat4 Object::getModelMatrix()const
 	}
 
 
-	//unity:Ëõ·Å£¬Ğı×ª£¬Æ½ÒÆ
+	//unity:ç¼©æ”¾ï¼Œæ—‹è½¬ï¼Œå¹³ç§»
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::scale(model, m_Scale);//Ëõ·Å
+	model = glm::scale(model, m_Scale);//ç¼©æ”¾
 	model = glm::rotate(model, glm::radians(m_AngleX), glm::vec3(1.0f, 0.0f, 0.0f));//pitch 
 	model = glm::rotate(model, glm::radians(m_AngleY), glm::vec3(0.0f, 1.0f, 0.0f));//yaw 
 	model = glm::rotate(model, glm::radians(m_AngleZ), glm::vec3(0.0f, 0.0f, 1.0f));//roll
 
 
-	model = parentMatrix * glm::translate(glm::mat4(1.0f), m_Position) * model;//Æ½ÒÆ
+	model = parentMatrix * glm::translate(glm::mat4(1.0f), m_Position) * model;//å¹³ç§»
 
 	return model;
 }
 
 void Object::addChild(Object* obj)
 {
-	//1. ¼ì²éÊÇ·ñ¼ÓÈë¹ıÕâ¸ö×Ó¶ÔÏó
+	//1. æ£€æŸ¥æ˜¯å¦åŠ å…¥è¿‡è¿™ä¸ªå­å¯¹è±¡
 	auto iter = std::find(m_Children.begin(), m_Children.end(), obj);
 	if (iter != m_Children.end())
 	{
 		return;
 	}
-	//2. Ìí¼Ó×Ó¶ÔÏóµ½×Ó¶ÔÏóÁĞ±í
+	//2. æ·»åŠ å­å¯¹è±¡åˆ°å­å¯¹è±¡åˆ—è¡¨
 	m_Children.push_back(obj);
 
-	//3. ÉèÖÃ¸¸¶ÔÏóÖ¸Õë
+	//3. è®¾ç½®çˆ¶å¯¹è±¡æŒ‡é’ˆ
 	obj->m_Parent = this;
 }
 

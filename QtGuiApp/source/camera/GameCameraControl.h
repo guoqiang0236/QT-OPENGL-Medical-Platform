@@ -7,20 +7,20 @@ public:
 	GameCameraControl();
 	~GameCameraControl();
 
-	// ÖØĞ´¸¸ÀàĞéº¯Êı
+	// é‡å†™çˆ¶ç±»è™šå‡½æ•°
 	void onCursor(double xpos, double ypos) override;
 	void update() override;
 
-	// ËÙ¶ÈÉèÖÃ½Ó¿Ú
+	// é€Ÿåº¦è®¾ç½®æ¥å£
 	void setSpeed(float s) { mSpeed = s; }
 
 private:
-	// ÄÚ²¿Ğı×ª¿ØÖÆ
+	// å†…éƒ¨æ—‹è½¬æ§åˆ¶
 	void rotatePitch(float angle);
 	void rotateYaw(float angle);
 
 private:
-	// ³ÉÔ±±äÁ¿£¨ÑÏ¸ñ°´Í¼Æ¬³õÊ¼»¯£©
-	float mPitch{ 0.0f };  // µ±Ç°¸©Ñö½Ç
-	float mSpeed{ 0.1f };  // Ä¬ÈÏÒÆ¶¯ËÙ¶È
+	// æˆå‘˜å˜é‡ï¼ˆä¸¥æ ¼æŒ‰å›¾ç‰‡åˆå§‹åŒ–ï¼‰
+	float mPitch{ 0.0f };  // å½“å‰ä¿¯ä»°è§’
+	float mSpeed{ 0.1f };  // é»˜è®¤ç§»åŠ¨é€Ÿåº¦
 };

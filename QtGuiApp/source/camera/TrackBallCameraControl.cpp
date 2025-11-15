@@ -12,56 +12,56 @@ TrackBallCameraControl::~TrackBallCameraControl()
 
 void TrackBallCameraControl::onCursor(double xpos, double ypos)
 {
-    // µ±×ó¼ü°´ÏÂÊ±´¦ÀíÏà»úĞı×ª
+    // å½“å·¦é”®æŒ‰ä¸‹æ—¶å¤„ç†ç›¸æœºæ—‹è½¬
     if (mLeftMouseDown)
     {
-        // µ÷ÕûÏà»úµÄ¸÷Àà²ÎÊı
-        // 1. ¼ÆËã¾­Ïß¸úÎ³ÏßĞı×ªµÄÔöÁ¿½Ç¶È(Õı¸º¶¼ÓĞ¿ÉÄÜ)
+        // è°ƒæ•´ç›¸æœºçš„å„ç±»å‚æ•°
+        // 1. è®¡ç®—ç»çº¿è·Ÿçº¬çº¿æ—‹è½¬çš„å¢é‡è§’åº¦(æ­£è´Ÿéƒ½æœ‰å¯èƒ½)
         float deltaX = static_cast<float>(xpos - mCurrentX) * mSensitivity;
         float deltaY = static_cast<float>(ypos - mCurrentY) * mSensitivity;
 
-        // 2. ·Ö¿ªpitch¸úyaw¸÷×Ô¼ÆËã
-        // £¨Í¼Æ¬ÖĞÎ´Õ¹Ê¾¾ßÌåÊµÏÖ£¬´Ë´¦Ìí¼ÓµäĞÍ´¦ÀíÂß¼­£©
-        rotatePitch(-deltaY);  // ¸©Ñö½Ç£¨ÉÏÏÂĞı×ª£©
-        rotateYaw(-deltaX);    // Æ«º½½Ç£¨×óÓÒĞı×ª£©
+        // 2. åˆ†å¼€pitchè·Ÿyawå„è‡ªè®¡ç®—
+        // ï¼ˆå›¾ç‰‡ä¸­æœªå±•ç¤ºå…·ä½“å®ç°ï¼Œæ­¤å¤„æ·»åŠ å…¸å‹å¤„ç†é€»è¾‘ï¼‰
+        rotatePitch(-deltaY);  // ä¿¯ä»°è§’ï¼ˆä¸Šä¸‹æ—‹è½¬ï¼‰
+        rotateYaw(-deltaX);    // åèˆªè§’ï¼ˆå·¦å³æ—‹è½¬ï¼‰
     }
     else if (mMiddleMouseDown)
     {
-        // 1. ¼ÆËã¾­Ïß¸úÎ³ÏßÆ½ÒÆµÄÔöÁ¿(Õı¸º¶¼ÓĞ¿ÉÄÜ)
+        // 1. è®¡ç®—ç»çº¿è·Ÿçº¬çº¿å¹³ç§»çš„å¢é‡(æ­£è´Ÿéƒ½æœ‰å¯èƒ½)
         float deltaX = static_cast<float>(xpos - mCurrentX) * mMoveSpeed;
         float deltaY = static_cast<float>(ypos - mCurrentY) * mMoveSpeed;
 
-        mCamera->mPosition += mCamera->mUp * deltaY; // ÉÏÏÂÆ½ÒÆ
-        mCamera->mPosition -= mCamera->mRight * deltaX; // ×óÓÒÆ½ÒÆ
+        mCamera->mPosition += mCamera->mUp * deltaY; // ä¸Šä¸‹å¹³ç§»
+        mCamera->mPosition -= mCamera->mRight * deltaX; // å·¦å³å¹³ç§»
     }
 
-    // ¸üĞÂµ±Ç°Êó±êÎ»ÖÃ£¨ÎŞÂÛÊÇ·ñ°´ÏÂ¶¼Ö´ĞĞ£©
+    // æ›´æ–°å½“å‰é¼ æ ‡ä½ç½®ï¼ˆæ— è®ºæ˜¯å¦æŒ‰ä¸‹éƒ½æ‰§è¡Œï¼‰
     mCurrentX = xpos;
     mCurrentY = ypos;
 }
 
 void TrackBallCameraControl::onScroll(double offset)
 {
-    mCamera->scale(offset * mScaleSpeed); // Ëõ·ÅÏà»ú
+    mCamera->scale(offset * mScaleSpeed); // ç¼©æ”¾ç›¸æœº
 }
 
 void TrackBallCameraControl::rotatePitch(float angle)
 {
-    // 1. ÈÆ×ÅmRightÏòÁ¿Ğı×ª
+    // 1. ç»•ç€mRightå‘é‡æ—‹è½¬
     auto mat = glm::rotate(glm::mat4(1.0f), glm::radians(angle), mCamera->mRight);
 
-    // 2. Ó°Ïìµ±Ç°Ïà»úµÄupÏòÁ¿ºÍÎ»ÖÃ
-    mCamera->mUp = mat * glm::vec4(mCamera->mUp, 0.0f); // vec4¸øµ½vec3£¬×Ô¶¯È¡xyz
+    // 2. å½±å“å½“å‰ç›¸æœºçš„upå‘é‡å’Œä½ç½®
+    mCamera->mUp = mat * glm::vec4(mCamera->mUp, 0.0f); // vec4ç»™åˆ°vec3ï¼Œè‡ªåŠ¨å–xyz
     mCamera->mPosition = mat * glm::vec4(mCamera->mPosition, 1.0f);
 }
 
 void TrackBallCameraControl::rotateYaw(float angle)
 {
-    //ÈÆ×ÅÊÀ½ç×ø±êÏµµÄYÖáĞı×ª
+    //ç»•ç€ä¸–ç•Œåæ ‡ç³»çš„Yè½´æ—‹è½¬
     auto mat = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    // 2. Ó°Ïìµ±Ç°Ïà»úµÄupÏòÁ¿¡¢rightÏòÁ¿ºÍÎ»ÖÃ
-    mCamera->mUp = mat * glm::vec4(mCamera->mUp, 0.0f); // vec4¸øµ½vec3£¬×Ô¶¯È¡xyz
+    // 2. å½±å“å½“å‰ç›¸æœºçš„upå‘é‡ã€rightå‘é‡å’Œä½ç½®
+    mCamera->mUp = mat * glm::vec4(mCamera->mUp, 0.0f); // vec4ç»™åˆ°vec3ï¼Œè‡ªåŠ¨å–xyz
     mCamera->mRight = mat * glm::vec4(mCamera->mRight, 0.0f);
     mCamera->mPosition = mat * glm::vec4(mCamera->mPosition, 1.0f);
 }

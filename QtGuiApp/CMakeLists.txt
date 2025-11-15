@@ -26,6 +26,7 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets OpenGLWidgets Quick QuickW
 set (GLM_DIR "${CMAKE_SOURCE_DIR}/Packages/glm-1.0.1-light")
 set (OpenCV_DIR "${CMAKE_SOURCE_DIR}/Packages/OpenCV4100")
 find_package(OpenCV REQUIRED)
+set (ASSIMP_DIR "${CMAKE_SOURCE_DIR}/Packages/assimp")
 set(DCMTK_ROOT ${CMAKE_SOURCE_DIR}/Packages/DCMTK3.6.9)
 set(DCMTK_LIBS
     iphlpapi
@@ -76,6 +77,7 @@ target_include_directories(QtGuiApp
         ${OpenCV_INCLUDE_DIRS}
         ${GLM_DIR}
         ${DCMTK_ROOT}/include
+        ${ASSIMP_DIR}/include
 )
 
 # 库lib目录
@@ -84,6 +86,7 @@ target_link_directories(QtGuiApp
         "${CMAKE_SOURCE_DIR}/lib"
         ${OpenCV_LIB_DIR}
         ${DCMTK_ROOT}/lib
+         ${ASSIMP_DIR}/lib
 )
 
 # 链接lib库
@@ -96,6 +99,8 @@ target_link_libraries(QtGuiApp PRIVATE
     Qt6::QuickWidgets
      ${OpenCV_LIBS}
      ${DCMTK_LIBS}
+     assimp-vc143-mt.lib
+     zlibstatic.lib
 )
 
 # 确保 MSVC 编译器以 UTF-8 方式读取源文件
@@ -109,4 +114,12 @@ add_custom_command(TARGET QtGuiApp POST_BUILD
     "${OpenCV_DIR}/x64/vc17/bin/opencv_world4100d.dll"
     "${OpenCV_DIR}/x64/vc17/bin/opencv_world4100.dll"
     $<TARGET_FILE_DIR:QtGuiApp>
+)
+
+# 复制 assimp 和 zlib 的 DLL 到可执行文件目录
+add_custom_command(TARGET QtGuiApp POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${ASSIMP_DIR}/bin/assimp-vc143-mt.dll"
+        "${ASSIMP_DIR}/bin/assimp-vc143-mtd.dll"
+        $<TARGET_FILE_DIR:QtGuiApp>
 )

@@ -6,11 +6,11 @@ class Texture :protected QOpenGLFunctions_4_5_Core
 {
 public:
 	Texture(const std::string& path, unsigned int unit);
-	Texture(unsigned int unit,		//¹ÒÔØµÄÎÆÀíµ¥Ôª
-		unsigned char* dataIn,	//ÄÚ´æÖ¸Õë
-		uint32_t widthIn,		//¿í¶È
-		uint32_t heightIn		//¸ß¶È
-	);//´ÓÄÚ´æÖĞ¶ÁÈ¡Í¼Æ¬²¢³õÊ¼»¯(²¿·Öfbx¼ÓÔØÄ£ĞÍµÄÊ±ºò»á°ÑÌùÍ¼Ò²Ò»Æğ¼ÓÔØµ½ÄÚ´æÖĞ)
+	Texture(unsigned int unit,		//æŒ‚è½½çš„çº¹ç†å•å…ƒ
+		unsigned char* dataIn,	//å†…å­˜æŒ‡é’ˆ
+		uint32_t widthIn,		//å®½åº¦
+		uint32_t heightIn		//é«˜åº¦
+	);//ä»å†…å­˜ä¸­è¯»å–å›¾ç‰‡å¹¶åˆå§‹åŒ–(éƒ¨åˆ†fbxåŠ è½½æ¨¡å‹çš„æ—¶å€™ä¼šæŠŠè´´å›¾ä¹Ÿä¸€èµ·åŠ è½½åˆ°å†…å­˜ä¸­)
 	Texture(unsigned int width, unsigned int height, unsigned int unit);
 	Texture(const std::vector<std::string>& paths, unsigned int unit);
 
@@ -21,9 +21,9 @@ public:
 	static Texture* createTextureFromMemory(
 		const std::string& path,
 		unsigned int unit,
-		unsigned char* dataIn,	//ÄÚ´æÖ¸Õë
-		uint32_t widthIn,		//¿í¶È
-		uint32_t heightIn		//¸ß¶È
+		unsigned char* dataIn,	//å†…å­˜æŒ‡é’ˆ
+		uint32_t widthIn,		//å®½åº¦
+		uint32_t heightIn		//é«˜åº¦
 	);
 	static Texture* createColorAttachment(unsigned int width, unsigned int height, unsigned int unit);
 	static Texture* createDepthStencilAttachment(unsigned int width, unsigned int height, unsigned int unit);
@@ -43,6 +43,6 @@ protected:
 	unsigned int mUnit{ 0 };
 	unsigned int mTextureTarget{ GL_TEXTURE_2D };
 
-	//×¢Òâ: ¾²Ì¬!! ÊôÓÚÀàµÄ ²»ÊôÓÚÄ³¸ö¶ÔÏó 
+	//æ³¨æ„: é™æ€!! å±äºç±»çš„ ä¸å±äºæŸä¸ªå¯¹è±¡ 
 	static std::map<std::string, Texture*> mTextureCache;
 };

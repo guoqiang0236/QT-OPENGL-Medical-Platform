@@ -1,654 +1,653 @@
-#include "MyGeometry.h"
-namespace MyOpenGL {
-    MyGeometry::MyGeometry(QObject* parent)
-    {
-        initializeOpenGLFunctions();
-    }
+#include "Geometry.h"
 
-    MyGeometry::MyGeometry(
-        const std::vector<float>& positions,
-        const std::vector<float>& normals,
-        const std::vector<float>& uvs,
-        const std::vector<unsigned int>& indices, QObject* parent)
-    {
-        initializeOpenGLFunctions();
-        mIndicesCount = indices.size();
+Geometry::Geometry(QObject* parent)
+{
+    initializeOpenGLFunctions();
+}
 
-        // VBO¥¥Ω®
-        //POS
-        glGenBuffers(1, &mPosVbo);
-        glBindBuffer(GL_ARRAY_BUFFER, mPosVbo);
-        glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(float), positions.data(), GL_STATIC_DRAW);
+Geometry::Geometry(
+    const std::vector<float>& positions,
+    const std::vector<float>& normals,
+    const std::vector<float>& uvs,
+    const std::vector<unsigned int>& indices, QObject* parent)
+{
+    initializeOpenGLFunctions();
+    mIndicesCount = indices.size();
 
-        //UV
-        glGenBuffers(1, &mUvVbo);
-        glBindBuffer(GL_ARRAY_BUFFER, mUvVbo);
-        glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(float), uvs.data(), GL_STATIC_DRAW);
+    // VBOÂàõÂª∫
+    //POS
+    glGenBuffers(1, &mPosVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, mPosVbo);
+    glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(float), positions.data(), GL_STATIC_DRAW);
 
-        // ∑®œﬂ
-        glGenBuffers(1, &mNormalVbo);
-        glBindBuffer(GL_ARRAY_BUFFER, mNormalVbo);
-        glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_STATIC_DRAW);
+    //UV
+    glGenBuffers(1, &mUvVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, mUvVbo);
+    glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(float), uvs.data(), GL_STATIC_DRAW);
 
-        //EBO
-        glGenBuffers(1, &mEbo);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEbo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+    // Ê≥ïÁ∫ø
+    glGenBuffers(1, &mNormalVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, mNormalVbo);
+    glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_STATIC_DRAW);
 
-        // VAO¥¥Ω®
-        glGenVertexArrays(1, &mVao);
-        glBindVertexArray(mVao);
+    //EBO
+    glGenBuffers(1, &mEbo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEbo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
-        // ∞Û∂®∂•µ„Œª÷√
-        glBindBuffer(GL_ARRAY_BUFFER, mPosVbo);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+    // VAOÂàõÂª∫
+    glGenVertexArrays(1, &mVao);
+    glBindVertexArray(mVao);
 
-        // ∞Û∂®UV◊¯±Í
-        glBindBuffer(GL_ARRAY_BUFFER, mUvVbo);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
+    // ÁªëÂÆöÈ°∂ÁÇπ‰ΩçÁΩÆ
+    glBindBuffer(GL_ARRAY_BUFFER, mPosVbo);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
 
-        // ∞Û∂®∑®œﬂ
-        glBindBuffer(GL_ARRAY_BUFFER, mNormalVbo);
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+    // ÁªëÂÆöUVÂùêÊ†á
+    glBindBuffer(GL_ARRAY_BUFFER, mUvVbo);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
 
-        // ∞Û∂®EBO
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEbo);
+    // ÁªëÂÆöÊ≥ïÁ∫ø
+    glBindBuffer(GL_ARRAY_BUFFER, mNormalVbo);
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
 
-        glBindVertexArray(0);
+    // ÁªëÂÆöEBO
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEbo);
 
-    }
+    glBindVertexArray(0);
 
-    MyGeometry::MyGeometry(const std::vector<float>& positions, const std::vector<float>& normals, const std::vector<float>& colors, const std::vector<float>& uvs, const std::vector<unsigned int>& indices, QObject* parent)
-    {
-        initializeOpenGLFunctions();
-        mIndicesCount = indices.size();
+}
 
-        // VBO¥¥Ω®
-        //POS
-        glGenBuffers(1, &mPosVbo);
-        glBindBuffer(GL_ARRAY_BUFFER, mPosVbo);
-        glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(float), positions.data(), GL_STATIC_DRAW);
+Geometry::Geometry(const std::vector<float>& positions, const std::vector<float>& normals, const std::vector<float>& colors, const std::vector<float>& uvs, const std::vector<unsigned int>& indices, QObject* parent)
+{
+    initializeOpenGLFunctions();
+    mIndicesCount = indices.size();
 
-        //UV
-        glGenBuffers(1, &mUvVbo);
-        glBindBuffer(GL_ARRAY_BUFFER, mUvVbo);
-        glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(float), uvs.data(), GL_STATIC_DRAW);
+    // VBOÂàõÂª∫
+    //POS
+    glGenBuffers(1, &mPosVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, mPosVbo);
+    glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(float), positions.data(), GL_STATIC_DRAW);
 
-        // ∑®œﬂ
-        glGenBuffers(1, &mNormalVbo);
-        glBindBuffer(GL_ARRAY_BUFFER, mNormalVbo);
-        glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_STATIC_DRAW);
+    //UV
+    glGenBuffers(1, &mUvVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, mUvVbo);
+    glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(float), uvs.data(), GL_STATIC_DRAW);
 
-        //colors
-		glGenBuffers(1, &mColorVbo);
-		glBindBuffer(GL_ARRAY_BUFFER, mColorVbo);
-		glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_STATIC_DRAW);
+    // Ê≥ïÁ∫ø
+    glGenBuffers(1, &mNormalVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, mNormalVbo);
+    glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_STATIC_DRAW);
+
+    //colors
+	glGenBuffers(1, &mColorVbo);
+	glBindBuffer(GL_ARRAY_BUFFER, mColorVbo);
+	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_STATIC_DRAW);
         
 
-        //EBO
-        glGenBuffers(1, &mEbo);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEbo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+    //EBO
+    glGenBuffers(1, &mEbo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEbo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
-        // VAO¥¥Ω®
-        glGenVertexArrays(1, &mVao);
-        glBindVertexArray(mVao);
+    // VAOÂàõÂª∫
+    glGenVertexArrays(1, &mVao);
+    glBindVertexArray(mVao);
 
-        // ∞Û∂®∂•µ„Œª÷√
-        glBindBuffer(GL_ARRAY_BUFFER, mPosVbo);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+    // ÁªëÂÆöÈ°∂ÁÇπ‰ΩçÁΩÆ
+    glBindBuffer(GL_ARRAY_BUFFER, mPosVbo);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
 
-        // ∞Û∂®UV◊¯±Í
-        glBindBuffer(GL_ARRAY_BUFFER, mUvVbo);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
+    // ÁªëÂÆöUVÂùêÊ†á
+    glBindBuffer(GL_ARRAY_BUFFER, mUvVbo);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
 
-        // ∞Û∂®∑®œﬂ
-        glBindBuffer(GL_ARRAY_BUFFER, mNormalVbo);
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+    // ÁªëÂÆöÊ≥ïÁ∫ø
+    glBindBuffer(GL_ARRAY_BUFFER, mNormalVbo);
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
 
-		//∞Û∂®—’…´
-		glBindBuffer(GL_ARRAY_BUFFER, mColorVbo);
-		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+	//ÁªëÂÆöÈ¢úËâ≤
+	glBindBuffer(GL_ARRAY_BUFFER, mColorVbo);
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
 
-        // ∞Û∂®EBO
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEbo);
+    // ÁªëÂÆöEBO
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEbo);
 
-        glBindVertexArray(0);
-    }
+    glBindVertexArray(0);
+}
 
-    MyGeometry::~MyGeometry()
+Geometry::~Geometry()
+{
+    if (mVao != 0)
     {
-        if (mVao != 0)
-        {
-            glDeleteVertexArrays(1, &mVao);
-            mVao = 0;
-        }
-        if (mPosVbo != 0)
-        {
-            glDeleteBuffers(1, &mPosVbo);
-            mPosVbo = 0;
-        }
-        if (mUvVbo != 0)
-        {
-            glDeleteBuffers(1, &mUvVbo);
-            mUvVbo = 0;
-        }
-        if (mEbo != 0)
-        {
-            glDeleteBuffers(1, &mEbo);
-            mEbo = 0;
-        }
-        if (mNormalVbo != 0)
-        {
-            glDeleteBuffers(1, &mNormalVbo);
-            mNormalVbo = 0;
-        }
-        if (mColorVbo != 0)
-        {
-            glDeleteBuffers(1, &mColorVbo);
-            mColorVbo = 0;
-        }
+        glDeleteVertexArrays(1, &mVao);
+        mVao = 0;
     }
-
-    MyGeometry* MyGeometry::createBox(float size)
+    if (mPosVbo != 0)
     {
-        MyGeometry* geometry = new MyGeometry();
-        // ¡¢∑ΩÃÂ∂•µ„ ˝æ›£®±ﬂ≥§ = 2 * halfSize£©
-        const float halfSize = size*0.5f; // ¡¢∑ΩÃÂ∞Î±ﬂ≥§
-
-        geometry->mIndicesCount = 36; // ¡¢∑ΩÃÂ”–6∏ˆ√Ê£¨√ø∏ˆ√Ê2∏ˆ»˝Ω«–Œ£¨√ø∏ˆ»˝Ω«–Œ3∏ˆ∂•µ„£¨◊‹π≤6*2*3=36∏ˆ∂•µ„
-
-        // ∂•µ„Œª÷√ ˝◊È (24∏ˆ∂•µ„£¨√ø∏ˆ√Ê4∏ˆ∂•µ„)
-        float positions[] = {
-            // «∞√Ê (Front)
-            -halfSize, -halfSize,  halfSize, // ◊Ûœ¬
-             halfSize, -halfSize,  halfSize, // ”“œ¬
-             halfSize,  halfSize,  halfSize, // ”“…œ
-            -halfSize,  halfSize,  halfSize, // ◊Û…œ
-
-            // ∫Û√Ê (Back)
-             halfSize, -halfSize, -halfSize, // ”“œ¬
-            -halfSize, -halfSize, -halfSize, // ◊Ûœ¬
-            -halfSize,  halfSize, -halfSize, // ◊Û…œ
-             halfSize,  halfSize, -halfSize, // ”“…œ
-
-             // ◊Û√Ê (Left)
-             -halfSize, -halfSize, -halfSize, // ◊Ûœ¬
-             -halfSize, -halfSize,  halfSize, // ”“œ¬
-             -halfSize,  halfSize,  halfSize, // ”“…œ
-             -halfSize,  halfSize, -halfSize, // ◊Û…œ
-
-             // ”“√Ê (Right)
-              halfSize, -halfSize,  halfSize, // ◊Ûœ¬
-              halfSize, -halfSize, -halfSize, // ”“œ¬
-              halfSize,  halfSize, -halfSize, // ”“…œ
-              halfSize,  halfSize,  halfSize, // ◊Û…œ
-
-              // …œ√Ê (Top)
-              -halfSize,  halfSize,  halfSize, // ◊Ûœ¬
-               halfSize,  halfSize,  halfSize, // ”“œ¬
-               halfSize,  halfSize, -halfSize, // ”“…œ
-              -halfSize,  halfSize, -halfSize, // ◊Û…œ
-
-              // œ¬√Ê (Bottom)
-              -halfSize, -halfSize, -halfSize, // ◊Ûœ¬
-               halfSize, -halfSize, -halfSize, // ”“œ¬
-               halfSize, -halfSize,  halfSize, // ”“…œ
-              -halfSize, -halfSize,  halfSize  // ◊Û…œ
-        };
-
-        // UV◊¯±Í ˝◊È (√ø∏ˆ√Ê4∏ˆUV◊¯±Í)
-        float uvs[] = {
-            // √ø∏ˆ√ÊµƒUV◊¯±ÍÀ≥–Ú: ◊Ûœ¬(0,0), ”“œ¬(1,0), ”“…œ(1,1), ◊Û…œ(0,1)
-            0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f, // Front
-            0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f, // Back
-            0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f, // Left
-            0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f, // Right
-            0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f, // Top
-            0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f  // Bottom
-        };
-
-        // À˜“˝ ˝◊È (36∏ˆÀ˜“˝£¨√ø∏ˆ√Ê6∏ˆÀ˜“˝)
-        unsigned int indices[] = {
-            // «∞√Ê
-            0, 1, 2,  2, 3, 0,
-            // ∫Û√Ê
-            4, 5, 6,  6, 7, 4,
-            // ◊Û√Ê
-            8, 9, 10,  10, 11, 8,
-            // ”“√Ê
-            12, 13, 14,  14, 15, 12,
-            // …œ√Ê
-            16, 17, 18,  18, 19, 16,
-            // œ¬√Ê
-            20, 21, 22,  22, 23, 20
-        };
-
-        //∑®œﬂ
-        float normals[] = {
-            // «∞√Ê (Front)
-            0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 1.0f,
-
-            // ∫Û√Ê (Back)
-            0.0f, 0.0f, -1.0f,
-            0.0f, 0.0f, -1.0f,
-            0.0f, 0.0f, -1.0f,
-            0.0f, 0.0f, -1.0f,
-
-            // ◊Û√Ê (Left)
-            -1.0f, 0.0f, 0.0f,
-            -1.0f, 0.0f, 0.0f,
-            -1.0f, 0.0f, 0.0f,
-            -1.0f, 0.0f, 0.0f,
-
-            // ”“√Ê (Right)
-            1.0f, 0.0f, 0.0f,
-            1.0f, 0.0f, 0.0f,
-            1.0f, 0.0f, 0.0f,
-            1.0f, 0.0f, 0.0f,
-
-            // …œ√Ê (Top)
-            0.0f, 1.0f, 0.0f,
-            0.0f, 1.0f, 0.0f,
-            0.0f, 1.0f, 0.0f,
-            0.0f, 1.0f, 0.0f,
-
-            // œ¬√Ê (Bottom)
-            0.0f, -1.0f, 0.0f,
-            0.0f, -1.0f, 0.0f,
-            0.0f, -1.0f, 0.0f,
-            0.0f, -1.0f, 0.0f
-        };
-
-
-        // VBO¥¥Ω®
-        GLuint& posVbo = geometry->mPosVbo,
-            uvVbo = geometry->mUvVbo,
-            ebo = geometry->mEbo,
-            normalVbo = geometry->mNormalVbo;
-
-        //POS
-        geometry->glGenBuffers(1, &posVbo);
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, posVbo);
-        geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
-
-        //UV
-        geometry->glGenBuffers(1, &uvVbo);
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
-        geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(uvs), uvs, GL_STATIC_DRAW);
-
-        // ∑®œﬂ
-        geometry->glGenBuffers(1, &normalVbo);
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, normalVbo);
-        geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW);
-
-        //EBO
-        geometry->glGenBuffers(1, &ebo);
-        geometry->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        geometry->glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-        // VAO¥¥Ω®
-        geometry->glGenVertexArrays(1, &geometry->mVao);
-        geometry->glBindVertexArray(geometry->mVao);
-
-        // ∞Û∂®∂•µ„Œª÷√
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, posVbo);
-        geometry->glEnableVertexAttribArray(0);
-        geometry->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
-
-        // ∞Û∂®UV◊¯±Í
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
-        geometry->glEnableVertexAttribArray(1);
-        geometry->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
-
-        // ∞Û∂®∑®œﬂ
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, normalVbo);
-        geometry->glEnableVertexAttribArray(2);
-        geometry->glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
-
-        // ∞Û∂®EBO
-        geometry->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-
-        geometry->glBindVertexArray(0);
-        return geometry;
+        glDeleteBuffers(1, &mPosVbo);
+        mPosVbo = 0;
     }
-
-    MyGeometry* MyGeometry::createSphere(float size)
+    if (mUvVbo != 0)
     {
-        MyGeometry* geometry = new MyGeometry();
+        glDeleteBuffers(1, &mUvVbo);
+        mUvVbo = 0;
+    }
+    if (mEbo != 0)
+    {
+        glDeleteBuffers(1, &mEbo);
+        mEbo = 0;
+    }
+    if (mNormalVbo != 0)
+    {
+        glDeleteBuffers(1, &mNormalVbo);
+        mNormalVbo = 0;
+    }
+    if (mColorVbo != 0)
+    {
+        glDeleteBuffers(1, &mColorVbo);
+        mColorVbo = 0;
+    }
+}
 
-        // …˘√˜Œ≥œﬂ”Îæ≠œﬂµƒ ˝¡ø
-        const int numLatLines = 60;  // Œ≥œﬂ
-        const int numLongLines = 60; // æ≠œﬂ
-        const float radius = size * 0.5f;
+Geometry* Geometry::createBox(float size)
+{
+    Geometry* geometry = new Geometry();
+    // Á´ãÊñπ‰ΩìÈ°∂ÁÇπÊï∞ÊçÆÔºàËæπÈïø = 2 * halfSizeÔºâ
+    const float halfSize = size*0.5f; // Á´ãÊñπ‰ΩìÂçäËæπÈïø
 
-        std::vector<float> positions;
-        std::vector<float> uvs;
-        std::vector<float> normals;
-        std::vector<unsigned int> indices;
+    geometry->mIndicesCount = 36; // Á´ãÊñπ‰ΩìÊúâ6‰∏™Èù¢ÔºåÊØè‰∏™Èù¢2‰∏™‰∏âËßíÂΩ¢ÔºåÊØè‰∏™‰∏âËßíÂΩ¢3‰∏™È°∂ÁÇπÔºåÊÄªÂÖ±6*2*3=36‰∏™È°∂ÁÇπ
 
-        // Õ®π˝¡Ω≤„—≠ª∑£®Œ≥œﬂ‘⁄Õ‚£¨æ≠œﬂ‘⁄ƒ⁄£©->Œª÷√°¢uv
-        for (int i = 0; i <= numLatLines; i++) {
-            float phi = i * glm::pi<float>() / numLatLines;  // Œ≥∂» [0, pi]
-            float xy = radius * sinf(phi);
-            float z = radius * cosf(phi);
+    // È°∂ÁÇπ‰ΩçÁΩÆÊï∞ÁªÑ (24‰∏™È°∂ÁÇπÔºåÊØè‰∏™Èù¢4‰∏™È°∂ÁÇπ)
+    float positions[] = {
+        // ÂâçÈù¢ (Front)
+        -halfSize, -halfSize,  halfSize, // Â∑¶‰∏ã
+            halfSize, -halfSize,  halfSize, // Âè≥‰∏ã
+            halfSize,  halfSize,  halfSize, // Âè≥‰∏ä
+        -halfSize,  halfSize,  halfSize, // Â∑¶‰∏ä
 
-            for (int j = 0; j <= numLongLines; j++) {
-                float theta = j * 2 * glm::pi<float>() / numLongLines;  // æ≠∂» [0, 2pi]
-                float x = xy * cosf(theta);
-                float y = xy * sinf(theta);
+        // ÂêéÈù¢ (Back)
+            halfSize, -halfSize, -halfSize, // Âè≥‰∏ã
+        -halfSize, -halfSize, -halfSize, // Â∑¶‰∏ã
+        -halfSize,  halfSize, -halfSize, // Â∑¶‰∏ä
+            halfSize,  halfSize, -halfSize, // Âè≥‰∏ä
 
-                positions.push_back(x);
-                positions.push_back(y);
-                positions.push_back(z);
+            // Â∑¶Èù¢ (Left)
+            -halfSize, -halfSize, -halfSize, // Â∑¶‰∏ã
+            -halfSize, -halfSize,  halfSize, // Âè≥‰∏ã
+            -halfSize,  halfSize,  halfSize, // Âè≥‰∏ä
+            -halfSize,  halfSize, -halfSize, // Â∑¶‰∏ä
 
-                float u = (float)j / numLongLines;
-                float v = (float)i / numLatLines;
-                uvs.push_back(u);
-                uvs.push_back(v);
+            // Âè≥Èù¢ (Right)
+            halfSize, -halfSize,  halfSize, // Â∑¶‰∏ã
+            halfSize, -halfSize, -halfSize, // Âè≥‰∏ã
+            halfSize,  halfSize, -halfSize, // Âè≥‰∏ä
+            halfSize,  halfSize,  halfSize, // Â∑¶‰∏ä
 
-                // ∑®œﬂ£∫◊¢“‚√ª”–πÈ“ªªØ£¨πÈ“ªªØ «‘⁄fragmentshader÷–Ω¯––µƒ
-                normals.push_back(x);
-                normals.push_back(y);
-                normals.push_back(z);
-            }
+            // ‰∏äÈù¢ (Top)
+            -halfSize,  halfSize,  halfSize, // Â∑¶‰∏ã
+            halfSize,  halfSize,  halfSize, // Âè≥‰∏ã
+            halfSize,  halfSize, -halfSize, // Âè≥‰∏ä
+            -halfSize,  halfSize, -halfSize, // Â∑¶‰∏ä
+
+            // ‰∏ãÈù¢ (Bottom)
+            -halfSize, -halfSize, -halfSize, // Â∑¶‰∏ã
+            halfSize, -halfSize, -halfSize, // Âè≥‰∏ã
+            halfSize, -halfSize,  halfSize, // Âè≥‰∏ä
+            -halfSize, -halfSize,  halfSize  // Â∑¶‰∏ä
+    };
+
+    // UVÂùêÊ†áÊï∞ÁªÑ (ÊØè‰∏™Èù¢4‰∏™UVÂùêÊ†á)
+    float uvs[] = {
+        // ÊØè‰∏™Èù¢ÁöÑUVÂùêÊ†áÈ°∫Â∫è: Â∑¶‰∏ã(0,0), Âè≥‰∏ã(1,0), Âè≥‰∏ä(1,1), Â∑¶‰∏ä(0,1)
+        0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f, // Front
+        0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f, // Back
+        0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f, // Left
+        0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f, // Right
+        0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f, // Top
+        0.0f, 0.0f,  1.0f, 0.0f,  1.0f, 1.0f,  0.0f, 1.0f  // Bottom
+    };
+
+    // Á¥¢ÂºïÊï∞ÁªÑ (36‰∏™Á¥¢ÂºïÔºåÊØè‰∏™Èù¢6‰∏™Á¥¢Âºï)
+    unsigned int indices[] = {
+        // ÂâçÈù¢
+        0, 1, 2,  2, 3, 0,
+        // ÂêéÈù¢
+        4, 5, 6,  6, 7, 4,
+        // Â∑¶Èù¢
+        8, 9, 10,  10, 11, 8,
+        // Âè≥Èù¢
+        12, 13, 14,  14, 15, 12,
+        // ‰∏äÈù¢
+        16, 17, 18,  18, 19, 16,
+        // ‰∏ãÈù¢
+        20, 21, 22,  22, 23, 20
+    };
+
+    //Ê≥ïÁ∫ø
+    float normals[] = {
+        // ÂâçÈù¢ (Front)
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+
+        // ÂêéÈù¢ (Back)
+        0.0f, 0.0f, -1.0f,
+        0.0f, 0.0f, -1.0f,
+        0.0f, 0.0f, -1.0f,
+        0.0f, 0.0f, -1.0f,
+
+        // Â∑¶Èù¢ (Left)
+        -1.0f, 0.0f, 0.0f,
+        -1.0f, 0.0f, 0.0f,
+        -1.0f, 0.0f, 0.0f,
+        -1.0f, 0.0f, 0.0f,
+
+        // Âè≥Èù¢ (Right)
+        1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+
+        // ‰∏äÈù¢ (Top)
+        0.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+
+        // ‰∏ãÈù¢ (Bottom)
+        0.0f, -1.0f, 0.0f,
+        0.0f, -1.0f, 0.0f,
+        0.0f, -1.0f, 0.0f,
+        0.0f, -1.0f, 0.0f
+    };
+
+
+    // VBOÂàõÂª∫
+    GLuint& posVbo = geometry->mPosVbo,
+        uvVbo = geometry->mUvVbo,
+        ebo = geometry->mEbo,
+        normalVbo = geometry->mNormalVbo;
+
+    //POS
+    geometry->glGenBuffers(1, &posVbo);
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, posVbo);
+    geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
+
+    //UV
+    geometry->glGenBuffers(1, &uvVbo);
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
+    geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(uvs), uvs, GL_STATIC_DRAW);
+
+    // Ê≥ïÁ∫ø
+    geometry->glGenBuffers(1, &normalVbo);
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, normalVbo);
+    geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW);
+
+    //EBO
+    geometry->glGenBuffers(1, &ebo);
+    geometry->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    geometry->glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // VAOÂàõÂª∫
+    geometry->glGenVertexArrays(1, &geometry->mVao);
+    geometry->glBindVertexArray(geometry->mVao);
+
+    // ÁªëÂÆöÈ°∂ÁÇπ‰ΩçÁΩÆ
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, posVbo);
+    geometry->glEnableVertexAttribArray(0);
+    geometry->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+
+    // ÁªëÂÆöUVÂùêÊ†á
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
+    geometry->glEnableVertexAttribArray(1);
+    geometry->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
+
+    // ÁªëÂÆöÊ≥ïÁ∫ø
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, normalVbo);
+    geometry->glEnableVertexAttribArray(2);
+    geometry->glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+
+    // ÁªëÂÆöEBO
+    geometry->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+
+    geometry->glBindVertexArray(0);
+    return geometry;
+}
+
+Geometry* Geometry::createSphere(float size)
+{
+    Geometry* geometry = new Geometry();
+
+    // Â£∞ÊòéÁ∫¨Á∫ø‰∏éÁªèÁ∫øÁöÑÊï∞Èáè
+    const int numLatLines = 60;  // Á∫¨Á∫ø
+    const int numLongLines = 60; // ÁªèÁ∫ø
+    const float radius = size * 0.5f;
+
+    std::vector<float> positions;
+    std::vector<float> uvs;
+    std::vector<float> normals;
+    std::vector<unsigned int> indices;
+
+    // ÈÄöËøá‰∏§Â±ÇÂæ™ÁéØÔºàÁ∫¨Á∫øÂú®Â§ñÔºåÁªèÁ∫øÂú®ÂÜÖÔºâ->‰ΩçÁΩÆ„ÄÅuv
+    for (int i = 0; i <= numLatLines; i++) {
+        float phi = i * glm::pi<float>() / numLatLines;  // Á∫¨Â∫¶ [0, pi]
+        float xy = radius * sinf(phi);
+        float z = radius * cosf(phi);
+
+        for (int j = 0; j <= numLongLines; j++) {
+            float theta = j * 2 * glm::pi<float>() / numLongLines;  // ÁªèÂ∫¶ [0, 2pi]
+            float x = xy * cosf(theta);
+            float y = xy * sinf(theta);
+
+            positions.push_back(x);
+            positions.push_back(y);
+            positions.push_back(z);
+
+            float u = (float)j / numLongLines;
+            float v = (float)i / numLatLines;
+            uvs.push_back(u);
+            uvs.push_back(v);
+
+            // Ê≥ïÁ∫øÔºöÊ≥®ÊÑèÊ≤°ÊúâÂΩí‰∏ÄÂåñÔºåÂΩí‰∏ÄÂåñÊòØÂú®fragmentshader‰∏≠ËøõË°åÁöÑ
+            normals.push_back(x);
+            normals.push_back(y);
+            normals.push_back(z);
         }
+    }
 
-        // …˙≥…À˜“˝
-        for (int i = 0; i < numLatLines; i++) {
-            for (int j = 0; j < numLongLines; j++) {
-                unsigned int first = i * (numLongLines + 1) + j;
-                unsigned int second = first + numLongLines + 1;
+    // ÁîüÊàêÁ¥¢Âºï
+    for (int i = 0; i < numLatLines; i++) {
+        for (int j = 0; j < numLongLines; j++) {
+            unsigned int first = i * (numLongLines + 1) + j;
+            unsigned int second = first + numLongLines + 1;
 
-                indices.push_back(first);
-                indices.push_back(second);
-                indices.push_back(first + 1);
+            indices.push_back(first);
+            indices.push_back(second);
+            indices.push_back(first + 1);
 
-                indices.push_back(second);
-                indices.push_back(second + 1);
-                indices.push_back(first + 1);
-            }
+            indices.push_back(second);
+            indices.push_back(second + 1);
+            indices.push_back(first + 1);
         }
-
-        geometry->mIndicesCount = static_cast<uint32_t>(indices.size());
-
-        // VBO¥¥Ω®
-        GLuint& posVbo = geometry->mPosVbo,
-            uvVbo = geometry->mUvVbo,
-            ebo = geometry->mEbo,
-            normalVbo = geometry->mNormalVbo;
-        // POS
-        geometry->glGenBuffers(1, &posVbo);
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, posVbo);
-        geometry->glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(float), positions.data(), GL_STATIC_DRAW);
-
-        // UV
-        geometry->glGenBuffers(1, &uvVbo);
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
-        geometry->glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(float), uvs.data(), GL_STATIC_DRAW);
-
-        // ∑®œﬂ
-        geometry->glGenBuffers(1, &normalVbo);
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, normalVbo);
-        geometry->glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_STATIC_DRAW);
-
-        // EBO
-        geometry->glGenBuffers(1, &ebo);
-        geometry->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        geometry->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
-
-        // VAO¥¥Ω®
-        geometry->glGenVertexArrays(1, &geometry->mVao);
-        geometry->glBindVertexArray(geometry->mVao);
-
-        // ∞Û∂®∂•µ„Œª÷√
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, posVbo);
-        geometry->glEnableVertexAttribArray(0);
-        geometry->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
-
-        // ∞Û∂®UV◊¯±Í
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
-        geometry->glEnableVertexAttribArray(1);
-        geometry->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
-
-        // ∞Û∂®∑®œﬂ
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, normalVbo);
-        geometry->glEnableVertexAttribArray(2);
-        geometry->glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
-
-        // ∞Û∂®EBO
-        geometry->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-
-        geometry->glBindVertexArray(0);
-        return geometry;
     }
 
-    MyGeometry* MyGeometry::createPlane(float width, float height)
-    {
-        MyGeometry* geometry = new MyGeometry();
+    geometry->mIndicesCount = static_cast<uint32_t>(indices.size());
 
-        geometry->mIndicesCount = 6;
+    // VBOÂàõÂª∫
+    GLuint& posVbo = geometry->mPosVbo,
+        uvVbo = geometry->mUvVbo,
+        ebo = geometry->mEbo,
+        normalVbo = geometry->mNormalVbo;
+    // POS
+    geometry->glGenBuffers(1, &posVbo);
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, posVbo);
+    geometry->glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(float), positions.data(), GL_STATIC_DRAW);
 
-        float halfW = width / 2.0f;
-        float halfH = height / 2.0f;
+    // UV
+    geometry->glGenBuffers(1, &uvVbo);
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
+    geometry->glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(float), uvs.data(), GL_STATIC_DRAW);
 
-        float positions[] = {
-            -halfW, -halfH, 0.0f,
-             halfW, -halfH, 0.0f,
-             halfW,  halfH, 0.0f,
-            -halfW,  halfH, 0.0f,
-        };
+    // Ê≥ïÁ∫ø
+    geometry->glGenBuffers(1, &normalVbo);
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, normalVbo);
+    geometry->glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_STATIC_DRAW);
 
-        float uvs[] = {
-            0.0f, 0.0f,
-            1.0f, 0.0f,
-            1.0f, 1.0f,
-            0.0f, 1.0f,
-        };
+    // EBO
+    geometry->glGenBuffers(1, &ebo);
+    geometry->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    geometry->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
-        float normals[] = {
-         0.0f, 0.0f, 1.0f,
-         0.0f, 0.0f, 1.0f,
-         0.0f, 0.0f, 1.0f,
-         0.0f, 0.0f, 1.0f,
-        };
+    // VAOÂàõÂª∫
+    geometry->glGenVertexArrays(1, &geometry->mVao);
+    geometry->glBindVertexArray(geometry->mVao);
 
-        unsigned int indices[] = {
-            0, 1, 2,
-            2, 3, 0
-        };
+    // ÁªëÂÆöÈ°∂ÁÇπ‰ΩçÁΩÆ
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, posVbo);
+    geometry->glEnableVertexAttribArray(0);
+    geometry->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
 
-        // VBO¥¥Ω®
-        GLuint& posVbo = geometry->mPosVbo,
-            uvVbo = geometry->mUvVbo,
-            ebo = geometry->mEbo,
-            normalVbo = geometry->mNormalVbo;
-        //POS
-        geometry->glGenBuffers(1, &posVbo);
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, posVbo);
-        geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
+    // ÁªëÂÆöUVÂùêÊ†á
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
+    geometry->glEnableVertexAttribArray(1);
+    geometry->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
 
-        //UV
-        geometry->glGenBuffers(1, &uvVbo);
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
-        geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(uvs), uvs, GL_STATIC_DRAW);
+    // ÁªëÂÆöÊ≥ïÁ∫ø
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, normalVbo);
+    geometry->glEnableVertexAttribArray(2);
+    geometry->glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
 
-        // ∑®œﬂ
-        geometry->glGenBuffers(1, &normalVbo);
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, normalVbo);
-        geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW);
+    // ÁªëÂÆöEBO
+    geometry->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-        //EBO
-        geometry->glGenBuffers(1, &ebo);
-        geometry->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        geometry->glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    geometry->glBindVertexArray(0);
+    return geometry;
+}
 
-        // VAO¥¥Ω®
-        geometry->glGenVertexArrays(1, &geometry->mVao);
-        geometry->glBindVertexArray(geometry->mVao);
+Geometry* Geometry::createPlane(float width, float height)
+{
+    Geometry* geometry = new Geometry();
 
-        // ∞Û∂®∂•µ„Œª÷√
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, posVbo);
-        geometry->glEnableVertexAttribArray(0);
-        geometry->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+    geometry->mIndicesCount = 6;
 
-        // ∞Û∂®UV◊¯±Í
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
-        geometry->glEnableVertexAttribArray(1);
-        geometry->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
+    float halfW = width / 2.0f;
+    float halfH = height / 2.0f;
 
-        // ∞Û∂®∑®œﬂ
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, normalVbo);
-        geometry->glEnableVertexAttribArray(2);
-        geometry->glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+    float positions[] = {
+        -halfW, -halfH, 0.0f,
+            halfW, -halfH, 0.0f,
+            halfW,  halfH, 0.0f,
+        -halfW,  halfH, 0.0f,
+    };
 
-        // ∞Û∂®EBO
-        geometry->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    float uvs[] = {
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        1.0f, 1.0f,
+        0.0f, 1.0f,
+    };
 
-        geometry->glBindVertexArray(0);
-        return geometry;
-    }
+    float normals[] = {
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+    };
 
-    MyGeometry* MyGeometry::createScreenPlane(float left, float right, float bottom, float top)
-    {
-        MyGeometry* geometry = new MyGeometry();
-        geometry->mIndicesCount = 6;
+    unsigned int indices[] = {
+        0, 1, 2,
+        2, 3, 0
+    };
 
-        //ππΩ® ˝æ›positions uv
-        float positions[] = {
-              left,  top,
-              left,  bottom,
-              right, bottom,
-              right, top
-        };
+    // VBOÂàõÂª∫
+    GLuint& posVbo = geometry->mPosVbo,
+        uvVbo = geometry->mUvVbo,
+        ebo = geometry->mEbo,
+        normalVbo = geometry->mNormalVbo;
+    //POS
+    geometry->glGenBuffers(1, &posVbo);
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, posVbo);
+    geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
 
-        float uvs[] = {
-            0.0f, 1.0f,
-            0.0f, 0.0f,
-            1.0f, 0.0f,
-            1.0f, 1.0f
-        };
+    //UV
+    geometry->glGenBuffers(1, &uvVbo);
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
+    geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(uvs), uvs, GL_STATIC_DRAW);
 
-        unsigned int indices[] = {
-            0, 1, 2,
-            0, 2, 3
-        };
+    // Ê≥ïÁ∫ø
+    geometry->glGenBuffers(1, &normalVbo);
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, normalVbo);
+    geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW);
 
-        //¥¥Ω®vao vboµ»
-        GLuint& posVbo = geometry->mPosVbo, uvVbo = geometry->mUvVbo;
-        geometry->glGenBuffers(1, &posVbo);
-		geometry->glBindBuffer(GL_ARRAY_BUFFER, posVbo);
-		geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
+    //EBO
+    geometry->glGenBuffers(1, &ebo);
+    geometry->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    geometry->glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-		geometry->glGenBuffers(1, &uvVbo);
-		geometry->glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
-		geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(uvs), uvs, GL_STATIC_DRAW);
+    // VAOÂàõÂª∫
+    geometry->glGenVertexArrays(1, &geometry->mVao);
+    geometry->glBindVertexArray(geometry->mVao);
 
-        geometry->glGenBuffers(1, &geometry->mEbo);
-        geometry->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->mEbo);
-        geometry->glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    // ÁªëÂÆöÈ°∂ÁÇπ‰ΩçÁΩÆ
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, posVbo);
+    geometry->glEnableVertexAttribArray(0);
+    geometry->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
 
-        //vao
-		geometry->glGenVertexArrays(1, &geometry->mVao);
-		geometry->glBindVertexArray(geometry->mVao);
+    // ÁªëÂÆöUVÂùêÊ†á
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
+    geometry->glEnableVertexAttribArray(1);
+    geometry->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
 
-		geometry->glBindBuffer(GL_ARRAY_BUFFER, posVbo);
-		geometry->glEnableVertexAttribArray(0);
-		geometry->glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
+    // ÁªëÂÆöÊ≥ïÁ∫ø
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, normalVbo);
+    geometry->glEnableVertexAttribArray(2);
+    geometry->glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
 
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
-        geometry->glEnableVertexAttribArray(1);
-        geometry->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
+    // ÁªëÂÆöEBO
+    geometry->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-        geometry->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->mEbo);
-		geometry->glBindVertexArray(0);
+    geometry->glBindVertexArray(0);
+    return geometry;
+}
 
-        return geometry;
-    }
+Geometry* Geometry::createScreenPlane(float left, float right, float bottom, float top)
+{
+    Geometry* geometry = new Geometry();
+    geometry->mIndicesCount = 6;
 
-    MyGeometry* MyGeometry::createLogoQuad(float width, float height)
-    {
-        MyGeometry* geometry = new MyGeometry();
+    //ÊûÑÂª∫Êï∞ÊçÆpositions uv
+    float positions[] = {
+            left,  top,
+            left,  bottom,
+            right, bottom,
+            right, top
+    };
 
-        geometry->mIndicesCount = 6;
+    float uvs[] = {
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        1.0f, 1.0f
+    };
 
-        // ∂•µ„◊¯±Í£®œÒÀÿø’º‰£¨◊Û…œΩ«Œ™(0,0)£¨”“œ¬Ω«Œ™(width, height)£©
-        float positions[] = {
-            0.0f,      0.0f,     0.0f, // ◊Û…œ
-            width,     0.0f,     0.0f, // ”“…œ
-            width,     height,   0.0f, // ”“œ¬
-            0.0f,      height,   0.0f, // ◊Ûœ¬
-        };
+    unsigned int indices[] = {
+        0, 1, 2,
+        0, 2, 3
+    };
 
-        float uvs[] = {
-            0.0f, 1.0f, // ◊Û…œ
-            1.0f, 1.0f, // ”“…œ
-            1.0f, 0.0f, // ”“œ¬
-            0.0f, 0.0f, // ◊Ûœ¬
-        };
+    //ÂàõÂª∫vao vboÁ≠â
+    GLuint& posVbo = geometry->mPosVbo, uvVbo = geometry->mUvVbo;
+    geometry->glGenBuffers(1, &posVbo);
+	geometry->glBindBuffer(GL_ARRAY_BUFFER, posVbo);
+	geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
 
-        float normals[] = {
-            0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 1.0f,
-        };
+	geometry->glGenBuffers(1, &uvVbo);
+	geometry->glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
+	geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(uvs), uvs, GL_STATIC_DRAW);
 
-        unsigned int indices[] = {
-            0, 1, 2,
-            2, 3, 0
-        };
+    geometry->glGenBuffers(1, &geometry->mEbo);
+    geometry->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->mEbo);
+    geometry->glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-        // VBO/EBO/VAO ¥¥Ω®
-        GLuint& posVbo = geometry->mPosVbo,
-            uvVbo = geometry->mUvVbo,
-            ebo = geometry->mEbo,
-            normalVbo = geometry->mNormalVbo;
+    //vao
+	geometry->glGenVertexArrays(1, &geometry->mVao);
+	geometry->glBindVertexArray(geometry->mVao);
 
-        geometry->glGenBuffers(1, &posVbo);
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, posVbo);
-        geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
+	geometry->glBindBuffer(GL_ARRAY_BUFFER, posVbo);
+	geometry->glEnableVertexAttribArray(0);
+	geometry->glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
 
-        geometry->glGenBuffers(1, &uvVbo);
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
-        geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(uvs), uvs, GL_STATIC_DRAW);
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
+    geometry->glEnableVertexAttribArray(1);
+    geometry->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
 
-        geometry->glGenBuffers(1, &normalVbo);
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, normalVbo);
-        geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW);
+    geometry->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->mEbo);
+	geometry->glBindVertexArray(0);
 
-        geometry->glGenBuffers(1, &ebo);
-        geometry->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        geometry->glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    return geometry;
+}
 
-        geometry->glGenVertexArrays(1, &geometry->mVao);
-        geometry->glBindVertexArray(geometry->mVao);
+Geometry* Geometry::createLogoQuad(float width, float height)
+{
+    Geometry* geometry = new Geometry();
 
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, posVbo);
-        geometry->glEnableVertexAttribArray(0);
-        geometry->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+    geometry->mIndicesCount = 6;
 
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
-        geometry->glEnableVertexAttribArray(1);
-        geometry->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
+    // È°∂ÁÇπÂùêÊ†áÔºàÂÉèÁ¥†Á©∫Èó¥ÔºåÂ∑¶‰∏äËßí‰∏∫(0,0)ÔºåÂè≥‰∏ãËßí‰∏∫(width, height)Ôºâ
+    float positions[] = {
+        0.0f,      0.0f,     0.0f, // Â∑¶‰∏ä
+        width,     0.0f,     0.0f, // Âè≥‰∏ä
+        width,     height,   0.0f, // Âè≥‰∏ã
+        0.0f,      height,   0.0f, // Â∑¶‰∏ã
+    };
 
-        geometry->glBindBuffer(GL_ARRAY_BUFFER, normalVbo);
-        geometry->glEnableVertexAttribArray(2);
-        geometry->glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+    float uvs[] = {
+        0.0f, 1.0f, // Â∑¶‰∏ä
+        1.0f, 1.0f, // Âè≥‰∏ä
+        1.0f, 0.0f, // Âè≥‰∏ã
+        0.0f, 0.0f, // Â∑¶‰∏ã
+    };
 
-        geometry->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    float normals[] = {
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,
+    };
 
-        geometry->glBindVertexArray(0);
-        return geometry;
-    }
+    unsigned int indices[] = {
+        0, 1, 2,
+        2, 3, 0
+    };
+
+    // VBO/EBO/VAO ÂàõÂª∫
+    GLuint& posVbo = geometry->mPosVbo,
+        uvVbo = geometry->mUvVbo,
+        ebo = geometry->mEbo,
+        normalVbo = geometry->mNormalVbo;
+
+    geometry->glGenBuffers(1, &posVbo);
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, posVbo);
+    geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
+
+    geometry->glGenBuffers(1, &uvVbo);
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
+    geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(uvs), uvs, GL_STATIC_DRAW);
+
+    geometry->glGenBuffers(1, &normalVbo);
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, normalVbo);
+    geometry->glBufferData(GL_ARRAY_BUFFER, sizeof(normals), normals, GL_STATIC_DRAW);
+
+    geometry->glGenBuffers(1, &ebo);
+    geometry->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    geometry->glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    geometry->glGenVertexArrays(1, &geometry->mVao);
+    geometry->glBindVertexArray(geometry->mVao);
+
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, posVbo);
+    geometry->glEnableVertexAttribArray(0);
+    geometry->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, uvVbo);
+    geometry->glEnableVertexAttribArray(1);
+    geometry->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (void*)0);
+
+    geometry->glBindBuffer(GL_ARRAY_BUFFER, normalVbo);
+    geometry->glEnableVertexAttribArray(2);
+    geometry->glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+
+    geometry->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+
+    geometry->glBindVertexArray(0);
+    return geometry;
 }

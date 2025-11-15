@@ -6,23 +6,23 @@
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 
-#include "tools/Mytools.h"
-#include "mesh/MyMesh.h"
-#include "material/MyPhongMaterial.h"
-#include "MyTexture.h"
+#include "tools/tools.h"
+#include "mesh/Mesh.h"
+#include "material/PhongMaterial.h"
+#include "Texture.h"
 
-class MyAssimpLoader
+class AssimpLoader
 {
 public:
-	MyAssimpLoader();
-	~MyAssimpLoader();
+	AssimpLoader();
+	~AssimpLoader();
 
-	static MyOpenGL::Object* load(const std::string& path);
+	static Object* load(const std::string& path);
 
 private:
-	static void processNode(aiNode* ainode, MyOpenGL::Object* parent, const aiScene* scene, const std::string& rootPath);
-    static MyOpenGL::MyMesh* processMesh(aiMesh* aimesh, const aiScene* scene, const std::string& rootPath);
-	static MyOpenGL::MyTexture* processTexture(const aiMaterial* aimat, const aiTextureType& type, const aiScene* scene, const std::string& rootPath);
+	static void processNode(aiNode* ainode, Object* parent, const aiScene* scene, const std::string& rootPath);
+    static Mesh* processMesh(aiMesh* aimesh, const aiScene* scene, const std::string& rootPath);
+	static Texture* processTexture(const aiMaterial* aimat, const aiTextureType& type, const aiScene* scene, const std::string& rootPath);
 
 	static glm::mat4 getMat4f(aiMatrix4x4 value);
 };

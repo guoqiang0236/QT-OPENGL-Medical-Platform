@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include<string>
 #include <QOpenGLFunctions_4_5_Core>
 #include <glm/glm.hpp>

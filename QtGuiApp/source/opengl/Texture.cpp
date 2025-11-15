@@ -1,4 +1,4 @@
-﻿#include "Texture.h"
+#include "Texture.h"
 #include "DicomTexture.h"
 #include <opencv2/opencv.hpp>
 

@@ -9,9 +9,9 @@ public:
 	~SpotLight();
 
 public:
-	glm::vec3 mTargetDirection = glm::vec3(-1.0f, -1.0f, -1.0f);// ¿´ÏòµÄ·½Ïò
-	float mInnerAngle{ 0.0f }; //ÄÚ²¿½Ç¶È
-	float mOuterAngle{ 0.0f }; //Íâ²¿½Ç¶È 
+	glm::vec3 mTargetDirection = glm::vec3(-1.0f, -1.0f, -1.0f);// çœ‹å‘çš„æ–¹å‘
+	float mInnerAngle{ 0.0f }; //å†…éƒ¨è§’åº¦
+	float mOuterAngle{ 0.0f }; //å¤–éƒ¨è§’åº¦ 
 
 };
 

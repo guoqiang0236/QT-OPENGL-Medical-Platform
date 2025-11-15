@@ -10,24 +10,24 @@ Camera2DControl::~Camera2DControl()
 
 void Camera2DControl::onCursor(double xpos, double ypos)
 {
-    // Ö»ÓĞ×ó¼ü°´ÏÂÊ±²ÅÔÊĞíÆ½ÒÆ(Ë®Æ½+´¹Ö±)
+    // åªæœ‰å·¦é”®æŒ‰ä¸‹æ—¶æ‰å…è®¸å¹³ç§»(æ°´å¹³+å‚ç›´)
     if (mLeftMouseDown)
     {
         float deltaX = static_cast<float>(xpos - mCurrentX) * mMoveSpeed;
         float deltaY = static_cast<float>(ypos - mCurrentY) * mMoveSpeed;
 
-        // 2DÆ½ÒÆ:Ö»ÒÆ¶¯XºÍYÖá
+        // 2Då¹³ç§»:åªç§»åŠ¨Xå’ŒYè½´
         mCamera->mPosition.x -= deltaX;
-        mCamera->mPosition.y += deltaY; // ×¢ÒâYÖá·½Ïò
+        mCamera->mPosition.y += deltaY; // æ³¨æ„Yè½´æ–¹å‘
     }
 
-    // ¸üĞÂµ±Ç°Êó±êÎ»ÖÃ
+    // æ›´æ–°å½“å‰é¼ æ ‡ä½ç½®
     mCurrentX = xpos;
     mCurrentY = ypos;
 }
 
 void Camera2DControl::onScroll(double offset)
 {
-    // ¹öÂÖËõ·Å
+    // æ»šè½®ç¼©æ”¾
     mCamera->scale(offset * mScaleSpeed);
 }

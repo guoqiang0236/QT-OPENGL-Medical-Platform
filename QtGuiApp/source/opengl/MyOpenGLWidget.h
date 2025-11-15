@@ -25,25 +25,25 @@ public:
 	void papaercamera();
 	void loadTexture(const std::string& imagePath);
 protected:
-	void keyPressEvent(QKeyEvent* event) override;       // ¶ÔÓ¦¼üÅÌ°´ÏÂ
-	void keyReleaseEvent(QKeyEvent* event) override;     // ¶ÔÓ¦¼üÅÌÊÍ·Å
-	void mousePressEvent(QMouseEvent* event) override;   // ¶ÔÓ¦Êó±ê°´ÏÂ
-	void mouseReleaseEvent(QMouseEvent* event) override; // ¶ÔÓ¦Êó±êÊÍ·Å
-	void mouseMoveEvent(QMouseEvent* event) override;    // ¶ÔÓ¦Êó±êÒÆ¶¯
+	void keyPressEvent(QKeyEvent* event) override;       // å¯¹åº”é”®ç›˜æŒ‰ä¸‹
+	void keyReleaseEvent(QKeyEvent* event) override;     // å¯¹åº”é”®ç›˜é‡Šæ”¾
+	void mousePressEvent(QMouseEvent* event) override;   // å¯¹åº”é¼ æ ‡æŒ‰ä¸‹
+	void mouseReleaseEvent(QMouseEvent* event) override; // å¯¹åº”é¼ æ ‡é‡Šæ”¾
+	void mouseMoveEvent(QMouseEvent* event) override;    // å¯¹åº”é¼ æ ‡ç§»åŠ¨
 	void wheelEvent(QWheelEvent* event)override;
-	void showEvent(QShowEvent* event) override; // ¶ÔÓ¦´°¿ÚÏÔÊ¾
+	void showEvent(QShowEvent* event) override; // å¯¹åº”çª—å£æ˜¾ç¤º
 
 private:
 
-	//×ÅÉ«Æ÷
+	//ç€è‰²å™¨
 	std::unique_ptr<Shader> m_Shader;
 
-	//ÉãÏñ»ú
-	Camera* m_camera = nullptr; // Í¸ÊÓÉãÏñ»ú
-	CameraControl* m_cameraControl = nullptr; // ÉãÏñ»ú¿ØÖÆÆ÷
+	//æ‘„åƒæœº
+	Camera* m_camera = nullptr; // é€è§†æ‘„åƒæœº
+	CameraControl* m_cameraControl = nullptr; // æ‘„åƒæœºæ§åˆ¶å™¨
 
-	// ÎÆÀí
+	// çº¹ç†
 	Texture* m_texture = nullptr;
 
-	float m_rotationAngle = 0.0f;  // Ìí¼ÓĞı×ª½Ç¶È±äÁ¿
+	float m_rotationAngle = 0.0f;  // æ·»åŠ æ—‹è½¬è§’åº¦å˜é‡
 };

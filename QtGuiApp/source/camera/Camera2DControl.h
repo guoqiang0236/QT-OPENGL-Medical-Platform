@@ -10,5 +10,5 @@ public:
     void onScroll(double offset) override;
 
 private:
-    float mMoveSpeed = 0.005f; // Æ½ÒÆËÙ¶È
+    float mMoveSpeed = 0.005f; // å¹³ç§»é€Ÿåº¦
 };

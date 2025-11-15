@@ -8,20 +8,20 @@ AssimpInstanceLoader::~AssimpInstanceLoader()
 {
 }
 
-MyOpenGL::Object* AssimpInstanceLoader::load(const std::string& path, int instanceCount) {
-	//ÄÃ³öÄ£ĞÍËùÔÚÄ¿Â¼
+Object* AssimpInstanceLoader::load(const std::string& path, int instanceCount) {
+	//æ‹¿å‡ºæ¨¡å‹æ‰€åœ¨ç›®å½•
 	std::size_t lastIndex = path.find_last_of("//");
 	auto rootPath = path.substr(0, lastIndex + 1);
 
 
-	MyOpenGL::Object* rootNode = new MyOpenGL::Object();
-	Assimp::Importer importer; //µ¼ÈëÆ÷
-	//aiProcess_Triangulate ½«Ä£ĞÍÖĞµÄËÄ±ßÃæÈı½ÇĞÎ»¯
-	//aiProcess_GenNormals  Èç¹ûÄ£ĞÍÃ»ÓĞ·¨ÏßÔòÉú³É·¨Ïß
+	Object* rootNode = new Object();
+	Assimp::Importer importer; //å¯¼å…¥å™¨
+	//aiProcess_Triangulate å°†æ¨¡å‹ä¸­çš„å››è¾¹é¢ä¸‰è§’å½¢åŒ–
+	//aiProcess_GenNormals  å¦‚æœæ¨¡å‹æ²¡æœ‰æ³•çº¿åˆ™ç”Ÿæˆæ³•çº¿
 	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenNormals);
 
-	//ÑéÖ¤¶ÁÈ¡ÊÇ·ñÕıÈ·Ë³Àû
-	//AI_SCENE_FLAGS_INCOMPLETE ÎÄ¼ş²»ÍêÕû
+	//éªŒè¯è¯»å–æ˜¯å¦æ­£ç¡®é¡ºåˆ©
+	//AI_SCENE_FLAGS_INCOMPLETE æ–‡ä»¶ä¸å®Œæ•´
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
 		std::cerr << "Error: Model Read Failed!" << std::endl;
@@ -33,30 +33,30 @@ MyOpenGL::Object* AssimpInstanceLoader::load(const std::string& path, int instan
 	return rootNode;
 }
 
-//´¦Àí½Úµã
-//aiNodeÏÂÃæÓĞchildrenµÄĞÅÏ¢,Ò²ÓĞmeshµÄ±àºÅ
-//Ã¿¸ö½Úµã¶ÔÓ¦Ò»¸öobject
-void AssimpInstanceLoader::processNode(aiNode* ainode, MyOpenGL::Object* parent, const aiScene* scene, const std::string& rootPath, int instanceCount) {
-	MyOpenGL::Object* node = new MyOpenGL::Object();
-	parent->addChild(node);//½¨Á¢ObjectµÄ¸¸×Ó¹ØÏµ
+//å¤„ç†èŠ‚ç‚¹
+//aiNodeä¸‹é¢æœ‰childrençš„ä¿¡æ¯,ä¹Ÿæœ‰meshçš„ç¼–å·
+//æ¯ä¸ªèŠ‚ç‚¹å¯¹åº”ä¸€ä¸ªobject
+void AssimpInstanceLoader::processNode(aiNode* ainode, Object* parent, const aiScene* scene, const std::string& rootPath, int instanceCount) {
+	Object* node = new Object();
+	parent->addChild(node);//å»ºç«‹Objectçš„çˆ¶å­å…³ç³»
 
 	glm::mat4 localMatrix = getMat4f(ainode->mTransformation);
-	//Î»ÖÃ Ğı×ª Ëõ·Å
+	//ä½ç½® æ—‹è½¬ ç¼©æ”¾
 	glm::vec3 position, eulerAngle, scale;
-	MyOpenGL::MyTools::decompose(localMatrix, position, eulerAngle, scale);
+	Tools::decompose(localMatrix, position, eulerAngle, scale);
 	node->setPosition(position);
 	node->setAngleX(eulerAngle.x);
 	node->setAngleY(eulerAngle.y);
 	node->setAngleZ(eulerAngle.z);
 	node->setScale(scale);
 
-	//¼ì²éÓĞÃ»ÓĞmesh²¢ÇÒ½âÎö
+	//æ£€æŸ¥æœ‰æ²¡æœ‰meshå¹¶ä¸”è§£æ
 	for (int i = 0; i < ainode->mNumMeshes; i++)
 	{
-		int meshID = ainode->mMeshes[i]; //ÕâÀïÖ»ÊÇÖªµÀID ÒªÕÒµ½meshµÄ¶ÔÏó»¹µÃÈ¥³¡¾°aiSceneÀïÃæ
-		aiMesh* aiMesh = scene->mMeshes[meshID];//ainodeÖ»ÊÇ´æµÄID sceneÀïÃæ²ÅÊÇ´æµÄ¶ÔÏó
-		MyOpenGL::MyMesh* mesh = processMesh(aiMesh, scene, rootPath, instanceCount);
-		node->addChild(mesh); //objectÏÂÃæ²»Ö»»á¹Ò½Úµãnode »¹»á¹Òmesh
+		int meshID = ainode->mMeshes[i]; //è¿™é‡Œåªæ˜¯çŸ¥é“ID è¦æ‰¾åˆ°meshçš„å¯¹è±¡è¿˜å¾—å»åœºæ™¯aiSceneé‡Œé¢
+		aiMesh* aiMesh = scene->mMeshes[meshID];//ainodeåªæ˜¯å­˜çš„ID sceneé‡Œé¢æ‰æ˜¯å­˜çš„å¯¹è±¡
+		Mesh* mesh = processMesh(aiMesh, scene, rootPath, instanceCount);
+		node->addChild(mesh); //objectä¸‹é¢ä¸åªä¼šæŒ‚èŠ‚ç‚¹node è¿˜ä¼šæŒ‚mesh
 	}
 
 	for (int i = 0; i < ainode->mNumChildren; i++)
@@ -66,8 +66,8 @@ void AssimpInstanceLoader::processNode(aiNode* ainode, MyOpenGL::Object* parent,
 	
 }
 
-////´¦Àímesh
-MyOpenGL::MyInstancedMesh* AssimpInstanceLoader::processMesh(aiMesh* aimesh, const aiScene* scene, const std::string& rootPath, int instanceCount) {
+////å¤„ç†mesh
+InstancedMesh* AssimpInstanceLoader::processMesh(aiMesh* aimesh, const aiScene* scene, const std::string& rootPath, int instanceCount) {
 	std::vector<float> positions;
 	std::vector<float> normals;
 	std::vector<float> uvs;
@@ -76,18 +76,18 @@ MyOpenGL::MyInstancedMesh* AssimpInstanceLoader::processMesh(aiMesh* aimesh, con
 
 	for (int i = 0; i < aimesh->mNumVertices; i++)
 	{
-		//µÚi¸ö¶¨µãµÄÎ»ÖÃ
+		//ç¬¬iä¸ªå®šç‚¹çš„ä½ç½®
 		positions.push_back(aimesh->mVertices[i].x);
 		positions.push_back(aimesh->mVertices[i].y);
 		positions.push_back(aimesh->mVertices[i].z);
 
-		//µÚi¸ö¶¨µãµÄ·¨Ïß
+		//ç¬¬iä¸ªå®šç‚¹çš„æ³•çº¿
 		normals.push_back(aimesh->mNormals[i].x);
 		normals.push_back(aimesh->mNormals[i].y);
 		normals.push_back(aimesh->mNormals[i].z);
 
-		//µÚi¸ö¶¥µãµÄÑÕÉ«
-		//ºÍuvÒ»Ñù,¹Ø×¢µÚ0Ì×
+		//ç¬¬iä¸ªé¡¶ç‚¹çš„é¢œè‰²
+		//å’Œuvä¸€æ ·,å…³æ³¨ç¬¬0å¥—
 		if (aimesh->HasVertexColors(0))
 		{
 			colors.push_back(aimesh->mColors[0][i].r);
@@ -95,25 +95,25 @@ MyOpenGL::MyInstancedMesh* AssimpInstanceLoader::processMesh(aiMesh* aimesh, con
 			colors.push_back(aimesh->mColors[0][i].b);
 		}
 
-		//µÚi¸ö¶¨µãµÄuv
-		//Ò»¸ömesh¿ÉÄÜÓĞnÌ×uv(diffuseÌùÍ¼uv,¹âÕÕÌùÍ¼uv...)
-		//Ò»°ã¹Ø×¢µÚ0Ì×uv,Ò»°ãÇé¿öÏÂµÚ0Ì×uvÊÇÌùÍ¼uv
-		if (aimesh->mTextureCoords[0]) //Èç¹û´æÔÚµÚ0Ì×uv
+		//ç¬¬iä¸ªå®šç‚¹çš„uv
+		//ä¸€ä¸ªmeshå¯èƒ½æœ‰nå¥—uv(diffuseè´´å›¾uv,å…‰ç…§è´´å›¾uv...)
+		//ä¸€èˆ¬å…³æ³¨ç¬¬0å¥—uv,ä¸€èˆ¬æƒ…å†µä¸‹ç¬¬0å¥—uvæ˜¯è´´å›¾uv
+		if (aimesh->mTextureCoords[0]) //å¦‚æœå­˜åœ¨ç¬¬0å¥—uv
 		{
 			uvs.push_back(aimesh->mTextureCoords[0][i].x); //u
 			uvs.push_back(aimesh->mTextureCoords[0][i].y); //v
 		}
 		else
 		{
-			//Èç¹û²»´æÔÚµÚ0Ì×uv ÔòÉèÖÃÎªÄ¬ÈÏÖµ
+			//å¦‚æœä¸å­˜åœ¨ç¬¬0å¥—uv åˆ™è®¾ç½®ä¸ºé»˜è®¤å€¼
 			uvs.push_back(0.0f);
 			uvs.push_back(0.0f);
 		}
 	}
 
-	//½âÎömeshÖĞµÄË÷ÒıÖµ
-	//Ã¿¸öÈı½ÇĞÎ¾ÍÊÇÒ»¸öaiFace
-	//±éÀúÃ¿Ò»¸öÈı½ÇĞÎ(face) -> ±éÀúÃ¿Ò»¸öindices
+	//è§£æmeshä¸­çš„ç´¢å¼•å€¼
+	//æ¯ä¸ªä¸‰è§’å½¢å°±æ˜¯ä¸€ä¸ªaiFace
+	//éå†æ¯ä¸€ä¸ªä¸‰è§’å½¢(face) -> éå†æ¯ä¸€ä¸ªindices
 	for (int i = 0; i < aimesh->mNumFaces; i++)
 	{
 		aiFace face = aimesh->mFaces[i];
@@ -123,74 +123,74 @@ MyOpenGL::MyInstancedMesh* AssimpInstanceLoader::processMesh(aiMesh* aimesh, con
 		}
 	}
 
-	auto geometry = new MyOpenGL::MyGeometry(positions, normals,colors, uvs, indices);
-	auto material = new MyOpenGL::MyPhongInstanceMaterial();
+	auto geometry = new Geometry(positions, normals,colors, uvs, indices);
+	auto material = new PhongInstanceMaterial();
 	material->mDepthWrite = false;
-	//½øĞĞÎÆÀí¶ÁÈ¡
+	//è¿›è¡Œçº¹ç†è¯»å–
 	if (aimesh->mMaterialIndex >= 0)
 	{
-		MyOpenGL::MyTexture* texture = nullptr;
+		Texture* texture = nullptr;
 		aiMaterial* aiMat = scene->mMaterials[aimesh->mMaterialIndex];
-		//1 ¶ÁÈ¡ÁËdiffuseÌùÍ¼
+		//1 è¯»å–äº†diffuseè´´å›¾
 		texture = processTexture(aiMat, aiTextureType_DIFFUSE, scene, rootPath);
 		if (texture == nullptr)
 		{
-			texture = MyOpenGL::MyTexture::createTexture("../assets/textures/defaultTexture.jpg", 0);
+			texture = Texture::createTexture("../assets/textures/defaultTexture.jpg", 0);
 		}
 		texture->setUnit(0);
 		material->mDiffuse = texture;
-		//2 ¶ÁÈ¡specularÌùÍ¼
+		//2 è¯»å–specularè´´å›¾
 		auto speclarMask = processTexture(aiMat, aiTextureType_SPECULAR, scene, rootPath);
 		if (speclarMask == nullptr)
 		{
-			speclarMask = MyOpenGL::MyTexture::createTexture("../assets/textures/defaultTexture.jpg", 0);
+			speclarMask = Texture::createTexture("../assets/textures/defaultTexture.jpg", 0);
 		}
 		speclarMask->setUnit(1);
 		material->mSpecularMask = speclarMask;
 	}
 	else
 	{
-		material->mDiffuse = MyOpenGL::MyTexture::createTexture("../assets/textures/defaultTexture.jpg", 0);
+		material->mDiffuse = Texture::createTexture("../assets/textures/defaultTexture.jpg", 0);
 	}
-	return new MyOpenGL::MyInstancedMesh(geometry, material, instanceCount);
+	return new InstancedMesh(geometry, material, instanceCount);
 }
 
 
-MyOpenGL::MyTexture* AssimpInstanceLoader::processTexture(
+Texture* AssimpInstanceLoader::processTexture(
 	const aiMaterial* aimat,
 	const aiTextureType& type,
 	const aiScene* scene, 
 	const std::string& rootPath) {
-	MyOpenGL::MyTexture* texture = nullptr;
-	//»ñÈ¡Í¼Æ¬¶ÁÈ¡Â·¾¶
+	Texture* texture = nullptr;
+	//è·å–å›¾ç‰‡è¯»å–è·¯å¾„
 	aiString aipath;
-	aimat->Get(AI_MATKEY_TEXTURE(type, 0), aipath); //»ñÈ¡diffuseÌùÍ¼µÄµÚ0ÕÅ
+	aimat->Get(AI_MATKEY_TEXTURE(type, 0), aipath); //è·å–diffuseè´´å›¾çš„ç¬¬0å¼ 
 	if (!aipath.length)
 	{
 		return nullptr;
 	}
 
-	//ÅĞ¶ÏÊÇ·ñÊÇÇ¶ÈëfbxµÄÍ¼Æ¬
-	const aiTexture* aitexture = scene->GetEmbeddedTexture(aipath.C_Str());//ÅĞ¶Ïµ±Ç°Â·¾¶ÓĞÃ»ÓĞÇ¶ÈëµÄÎÆÀíÓëÖ®¶ÔÓ¦
+	//åˆ¤æ–­æ˜¯å¦æ˜¯åµŒå…¥fbxçš„å›¾ç‰‡
+	const aiTexture* aitexture = scene->GetEmbeddedTexture(aipath.C_Str());//åˆ¤æ–­å½“å‰è·¯å¾„æœ‰æ²¡æœ‰åµŒå…¥çš„çº¹ç†ä¸ä¹‹å¯¹åº”
 	if (aitexture)
 	{
-		//ÎÆÀíÍ¼Æ¬ÊÇÄÚÇ¶µÄ
-		unsigned char* dataIn = reinterpret_cast<unsigned char*>(aitexture->pcData); // reinterpret_castÊÇÇ¿ÖÆµÄÀàĞÍ×ª»»
-		uint32_t widthIn = aitexture->mWidth; //Í¨³£Çé¿öÏÂ(png, jpg),´ú±íÁËÕûÕÅÍ¼Æ¬µÄ´óĞ¡(heightÊÇ0)
+		//çº¹ç†å›¾ç‰‡æ˜¯å†…åµŒçš„
+		unsigned char* dataIn = reinterpret_cast<unsigned char*>(aitexture->pcData); // reinterpret_castæ˜¯å¼ºåˆ¶çš„ç±»å‹è½¬æ¢
+		uint32_t widthIn = aitexture->mWidth; //é€šå¸¸æƒ…å†µä¸‹(png, jpg),ä»£è¡¨äº†æ•´å¼ å›¾ç‰‡çš„å¤§å°(heightæ˜¯0)
 		uint32_t heightIn = aitexture->mHeight;
-		texture = MyOpenGL::MyTexture::createTextureFromMemory(aipath.C_Str(), 0, dataIn, widthIn, heightIn);
+		texture = Texture::createTextureFromMemory(aipath.C_Str(), 0, dataIn, widthIn, heightIn);
 	}
 	else
 	{
-		//ÎÆÀíÍ¼Æ¬ÔÚÓ²ÅÌÉÏ
+		//çº¹ç†å›¾ç‰‡åœ¨ç¡¬ç›˜ä¸Š
 		std::string fullPath = rootPath + aipath.C_Str();
-		texture = MyOpenGL::MyTexture::createTexture(fullPath, 0);
+		texture = Texture::createTexture(fullPath, 0);
 	}
 	return texture;
 }
 //
 
-//½«AssimpµÄaiMatrix×ª»¯ÎªopenGLµÄglmat4
+//å°†Assimpçš„aiMatrixè½¬åŒ–ä¸ºopenGLçš„glmat4
 glm::mat4 AssimpInstanceLoader::getMat4f(aiMatrix4x4 value) {
 	glm::mat4 to(
 		value.a1, value.a2, value.a3, value.a4,

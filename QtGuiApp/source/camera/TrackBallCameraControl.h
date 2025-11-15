@@ -8,7 +8,7 @@ public:
     TrackBallCameraControl();
     ~TrackBallCameraControl();
 
-    // 重写父类光标事件处理函数
+    // 閲嶅啓鐖剁被鍏夋爣浜嬩欢澶勭悊鍑芥暟
     void onCursor(double xpos, double ypos) override;
 
     void onScroll(double offset) override;

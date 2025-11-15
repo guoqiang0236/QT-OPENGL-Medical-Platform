@@ -35,7 +35,7 @@ protected:
     // 4. 记录键盘相关按键的相关状态
     std::map<int, bool> mKeyMap;
 
-    // 5. 存储一个MyCamera对象、
+    // 5. 存储一个Camera对象、
     Camera* mCamera = nullptr;
 
     // 6. 记录相机缩放的速度
