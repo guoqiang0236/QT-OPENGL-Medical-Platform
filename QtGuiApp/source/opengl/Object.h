@@ -39,6 +39,7 @@ public:
 
     //父子关系
     void addChild(Object* obj);             // 添加子对象
+    void removeChild(Object* obj);          // ✅ 新增:移除子对象
     std::vector<Object*> getChildren();     // 获取所有子对象
     Object* getParent();                    // 获取父对象指针
 

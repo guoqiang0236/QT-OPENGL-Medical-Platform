@@ -65,7 +65,7 @@ void MyOpenGLWidget::paintGL()
 	update(); // 请求下一帧重绘
 }
 
-// ✨ 核心方法：运行时切换纹理
+
 void MyOpenGLWidget::switchTexture(const std::string& imagePath)
 {
 	// 在 OpenGL 线程中执行
@@ -82,36 +82,77 @@ void MyOpenGLWidget::switchTexture(const std::string& imagePath)
 		return;
 	}
 
-	
-	// 如果已经有图像mesh,更新其材质的纹理
-	if (m_imageMesh && m_imageMaterial) {
-		// ✅ 尝试转换为 ImageMaterial
-		ImageMaterial* imageMat = dynamic_cast<ImageMaterial*>(m_imageMaterial);
-		if (imageMat) {
-			imageMat->mDiffuse = newTexture;
-			qDebug() << "SUCCESS: ImageMaterial纹理切换完成!";
+	// ✅ 检测新纹理类型
+	DicomTexture* newDicomTex = dynamic_cast<DicomTexture*>(newTexture);
+	bool isNewDicom = (newDicomTex != nullptr);
+
+	// ✅ 检测当前材质类型
+	bool isCurrentDicom = false;
+	if (m_imageMaterial) {
+		DicomMaterial* currentDicomMat = dynamic_cast<DicomMaterial*>(m_imageMaterial);
+		isCurrentDicom = (currentDicomMat != nullptr);
+	}
+
+	// ========== 情况1: 首次创建 ==========
+	if (!m_imageMesh || !m_imageMaterial) {
+		qDebug() << "🆕 首次创建 Mesh";
+		createImageMesh(newTexture);
+	}
+	// ========== 情况2: 类型相同,仅更新纹理 ==========
+	else if (isNewDicom == isCurrentDicom) {
+		qDebug() << "🔄 类型相同,更新纹理";
+
+		if (isCurrentDicom) {
+			// DICOM -> DICOM
+			DicomMaterial* dicomMat = dynamic_cast<DicomMaterial*>(m_imageMaterial);
+			dicomMat->mDiffuse = newTexture;
+
+			// ✅ 更新像素值范围
+			dicomMat->mMinPixelValue = newDicomTex->getMinPixelValue();
+			dicomMat->mMaxPixelValue = newDicomTex->getMaxPixelValue();
+
+			qDebug() << "  ✅ DICOM材质更新完成";
 		}
 		else {
-			// ✅ 尝试转换为 DicomMaterial
-			DicomMaterial* dicomMat = dynamic_cast<DicomMaterial*>(m_imageMaterial);
-			if (dicomMat) {
-				dicomMat->mDiffuse = newTexture;
-				qDebug() << "SUCCESS: DicomMaterial纹理切换完成!";
-			}
+			// 普通图片 -> 普通图片
+			ImageMaterial* imageMat = dynamic_cast<ImageMaterial*>(m_imageMaterial);
+			imageMat->mDiffuse = newTexture;
+			qDebug() << "  ✅ Image材质更新完成";
 		}
-		qDebug() << "新尺寸:" << newTexture->getWidth() << "x" << newTexture->getHeight();
 	}
+	// ========== 情况3: 类型不同,重建整个 Mesh ==========
 	else {
-		// 首次创建图像mesh
+		qDebug() << "⚠️ 材质类型切换: "
+			<< (isCurrentDicom ? "DICOM" : "Image")
+			<< " -> "
+			<< (isNewDicom ? "DICOM" : "Image");
+
+		// ✅ 从场景中移除旧 Mesh
+		if (m_imageMesh) {
+			m_scene->removeChild(m_imageMesh);
+			delete m_imageMesh;
+			m_imageMesh = nullptr;
+		}
+
+		// ✅ 删除旧材质(Mesh 会管理 Geometry,但不管理 Material)
+		if (m_imageMaterial) {
+			delete m_imageMaterial;
+			m_imageMaterial = nullptr;
+		}
+
+		// ✅ 创建新 Mesh
 		createImageMesh(newTexture);
-		qDebug() << "SUCCESS: 图像Mesh创建完成! 纹理尺寸:" << newTexture->getWidth() << "x" << newTexture->getHeight();
+		qDebug() << "  ✅ Mesh 重建完成";
 	}
+
+	qDebug() << "✅ 纹理切换成功! 新尺寸:"
+		<< newTexture->getWidth() << "x" << newTexture->getHeight();
+
 	// 触发重绘
 	update();
 
 	doneCurrent();
 }
-
 
 
 void MyOpenGLWidget::createImageMesh(Texture* texture)

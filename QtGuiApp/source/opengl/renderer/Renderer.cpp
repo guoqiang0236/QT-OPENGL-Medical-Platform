@@ -527,7 +527,7 @@ void Renderer::rendererObject(Object* object, Camera* camera,
 			// 绑定纹理
 			if (dicomMat->mDiffuse) {
 				dicomMat->mDiffuse->bind();
-				shader->setInt("dicomTexture", 0);
+				shader->setInt("dicomTexture", 2);
 			}
 
 			// 设置 DICOM 特有的 uniform

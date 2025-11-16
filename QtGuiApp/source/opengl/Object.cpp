@@ -88,6 +88,20 @@ void Object::addChild(Object* obj)
 	obj->m_Parent = this;
 }
 
+void Object::removeChild(Object* obj)
+{
+	// 1. 查找子对象
+	auto iter = std::find(m_Children.begin(), m_Children.end(), obj);
+
+	// 2. 如果找到,则移除
+	if (iter != m_Children.end()) {
+		m_Children.erase(iter);
+
+		// 3. 清除父对象指针
+		obj->m_Parent = nullptr;
+	}
+}
+
 std::vector<Object*> Object::getChildren()
 {
 	return m_Children;
