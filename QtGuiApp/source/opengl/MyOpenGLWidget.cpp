@@ -8,6 +8,16 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "DicomTexture.h"
 
+#include "renderer/Renderer.h"
+#include "Scene.h"
+#include "Geometry.h"                        
+#include "material/imageMaterial.h"
+#include "material/DicomMaterial.h"
+#include "mesh/Mesh.h"                       
+#include "Light/DirectionalLight.h"
+#include "Light/PointLight.h"
+#include "Light/SpotLight.h"
+#include "Light/AmbientLight.h"
 
 MyOpenGLWidget::MyOpenGLWidget(QWidget* parent):QOpenGLWidget(parent)
 {
@@ -16,8 +26,19 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget* parent):QOpenGLWidget(parent)
 void MyOpenGLWidget::initializeGL()
 {
 	initializeOpenGLFunctions();
-	paperrectangle();
-	papershader("../assets/shaders/dicom.vert", "../assets/shaders/dicom.frag");
+
+	//初始化渲染器
+	m_renderer = new Renderer();
+	m_renderer->setWidth(width());
+	m_renderer->setHeight(height());
+
+	// 初始化场景
+	m_scene = new Scene();
+
+	// 初始化光源(ImageMaterial不需要光照,但Renderer需要这些参数)
+	m_dirLight = new DirectionalLight();
+	m_ambLight = new AmbientLight();
+	m_spotLight = nullptr;
 	papaercamera();
 }
 
@@ -29,53 +50,17 @@ void MyOpenGLWidget::resizeGL(int w, int h)
 void MyOpenGLWidget::paintGL()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); 
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT); // use方法
-	if (m_Shader && m_camera && m_texture)
-	{
-		m_Shader->begin();
-
-		// 设置 Model 矩阵（模型变换，这里保持单位矩阵）
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(m_rotationAngle), glm::vec3(0.0f, 0.0f, 1.0f));
-		m_Shader->setMatrix4x4("model", model);
-
-
-
-		// 设置 View 矩阵（相机视图）
-		glm::mat4 view = m_camera->getViewMatrix();
-		m_Shader->setMatrix4x4("view", view);
-
-		// 设置 Projection 矩阵（透视投影）
-		glm::mat4 projection = m_camera->getProjectionMatrix();
-		m_Shader->setMatrix4x4("projection", projection);
-		
-		DicomTexture* dicomTexture = dynamic_cast<DicomTexture*>(m_texture);
-		if (dicomTexture) {
-			float minVal = dicomTexture->getMinPixelValue();
-			float maxVal = dicomTexture->getMaxPixelValue();
-
-			m_Shader->setFloat("minPixelValue", minVal);
-			m_Shader->setFloat("maxPixelValue", maxVal);
-
-			qDebug() << "📊 传递给着色器: min=" << minVal << " max=" << maxVal;
-		}
-
-
-		m_texture->bind();
-		m_Shader->setInt("imageTexture", 0); // 纹理单元 0
-
-		glBindVertexArray(VAO);
-		// 参数：绘制模式、索引数量、索引数据类型、索引缓冲偏移
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-		m_Shader->end();
+	if (m_renderer && m_scene && m_camera) {
+		// 使用渲染器渲染场景
+		m_renderer->render(
+			m_scene,
+			m_camera,
+			m_dirLight,
+			m_pointLights,
+			m_spotLight,
+			m_ambLight
+		);
 	}
-
-	// 更新旋转角度
-	/*m_rotationAngle += 1.0f;
-	if (m_rotationAngle >= 360.0f) {
-		m_rotationAngle = 0.0f;
-	}*/
 
 	update(); // 请求下一帧重绘
 }
@@ -89,7 +74,7 @@ void MyOpenGLWidget::switchTexture(const std::string& imagePath)
 	qDebug() << "[切换纹理] 新路径:" << QString::fromStdString(imagePath);
 
 	// 加载新纹理
-	Texture* newTexture = Texture::createTexture(imagePath, 0);
+	Texture* newTexture = Texture::createTexture(imagePath, 2);
 
 	if (!newTexture) {
 		qDebug() << "ERROR: 新纹理加载失败:" << QString::fromStdString(imagePath);
@@ -97,70 +82,99 @@ void MyOpenGLWidget::switchTexture(const std::string& imagePath)
 		return;
 	}
 
-	// 替换旧纹理
-	m_texture = newTexture;
-
-	qDebug() << "SUCCESS: 纹理切换完成! 新尺寸:" << m_texture->getWidth() << "x" << m_texture->getHeight();
-
+	
+	// 如果已经有图像mesh,更新其材质的纹理
+	if (m_imageMesh && m_imageMaterial) {
+		// ✅ 尝试转换为 ImageMaterial
+		ImageMaterial* imageMat = dynamic_cast<ImageMaterial*>(m_imageMaterial);
+		if (imageMat) {
+			imageMat->mDiffuse = newTexture;
+			qDebug() << "SUCCESS: ImageMaterial纹理切换完成!";
+		}
+		else {
+			// ✅ 尝试转换为 DicomMaterial
+			DicomMaterial* dicomMat = dynamic_cast<DicomMaterial*>(m_imageMaterial);
+			if (dicomMat) {
+				dicomMat->mDiffuse = newTexture;
+				qDebug() << "SUCCESS: DicomMaterial纹理切换完成!";
+			}
+		}
+		qDebug() << "新尺寸:" << newTexture->getWidth() << "x" << newTexture->getHeight();
+	}
+	else {
+		// 首次创建图像mesh
+		createImageMesh(newTexture);
+		qDebug() << "SUCCESS: 图像Mesh创建完成! 纹理尺寸:" << newTexture->getWidth() << "x" << newTexture->getHeight();
+	}
 	// 触发重绘
 	update();
 
 	doneCurrent();
 }
 
-void MyOpenGLWidget::paperrectangle()
+
+
+void MyOpenGLWidget::createImageMesh(Texture* texture)
 {
-	// 顶点数据
-	// 交错存储：位置(3 float) + UV(2 float) = 5 float 每顶点
-	std::vector<float> vertices = {
-		// 位置 (x, y, z)      // UV (u, v)
-		-0.5f, -0.5f, 0.0f,    0.0f, 0.0f,   // 顶点 0：左下
-		 0.5f, -0.5f, 0.0f,    1.0f, 0.0f,   // 顶点 1：右下
-		 0.5f,  0.5f, 0.0f,    1.0f, 1.0f,   // 顶点 2：右上
-		-0.5f,  0.5f, 0.0f,    0.0f, 1.0f    // 顶点 3：左上
-	};
-	// 索引数据（两个三角形，6 个索引）
-	std::vector<unsigned int> indices = {
-		0, 1, 2, 
-		0, 2, 3  
-	};
-	// 创建 VBO
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+    if (!texture || !m_scene) {
+        qDebug() << "ERROR: createImageMesh - texture 或 scene 为空";
+        return;
+    }
 
-	// 创建 EBO（索引缓冲）
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+    // 计算宽高比和平面尺寸
+    float aspect = static_cast<float>(width()) / static_cast<float>(height());
+    Geometry* planeGeometry = Geometry::createPlane(2.0f * aspect, 2.0f);
 
-	// 创建 VAO
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
+    // ✅ 根据纹理类型智能选择材质
+    DicomTexture* dicomTex = dynamic_cast<DicomTexture*>(texture);
+    
+    if (dicomTex) {
+        // ========== DICOM 纹理 -> 使用 DicomMaterial ==========
+        qDebug() << "🔬 检测到 DICOM 纹理, 创建 DicomMaterial";
+        
+        DicomMaterial* dicomMaterial = new DicomMaterial();
+        dicomMaterial->mDiffuse = texture;
+        
+        // 从 DicomTexture 获取像素值范围
+        dicomMaterial->mMinPixelValue = dicomTex->getMinPixelValue();
+        dicomMaterial->mMaxPixelValue = dicomTex->getMaxPixelValue();
+        
+        // 配置材质状态
+        dicomMaterial->mDepthTest = true;
+        dicomMaterial->mDepthWrite = true;
+        
+        // 创建 Mesh
+        m_imageMesh = new Mesh(planeGeometry, dicomMaterial);
+        m_imageMaterial = dicomMaterial;  // 保存为基类指针
+        
+        qDebug() << "  ✅ DicomMaterial 创建完成";
+        qDebug() << "     - 像素值范围: [" << dicomMaterial->mMinPixelValue 
+                 << ", " << dicomMaterial->mMaxPixelValue << "]";
+    }
+    else {
+        // ========== 普通图像 -> 使用 ImageMaterial ==========
+        qDebug() << "🖼️  检测到普通图像, 创建 ImageMaterial";
+        
+        ImageMaterial* imageMaterial = new ImageMaterial();
+        imageMaterial->mDiffuse = texture;
+        
+        // 配置材质状态
+        imageMaterial->mDepthTest = true;
+        imageMaterial->mDepthWrite = true;
+        
+        // 创建 Mesh
+        m_imageMesh = new Mesh(planeGeometry, imageMaterial);
+        m_imageMaterial = imageMaterial;  // 保存为基类指针
+        
+        qDebug() << "  ✅ ImageMaterial 创建完成";
+    }
 
-	// 绑定 VBO
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    // 设置 Mesh 位置并添加到场景
+    m_imageMesh->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    m_scene->addChild(m_imageMesh);
 
-	// 位置属性（location 0）
-	glEnableVertexArrayAttrib(VAO, 0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-	
-	// UV 属性（location 1）
-	glEnableVertexArrayAttrib(VAO, 1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-
-	// 绑定 EBO 到 VAO（重要！）
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
-	glBindVertexArray(0);
+    qDebug() << "✅ Mesh 创建成功, 平面尺寸:" << (2.0f * aspect) << "x 2.0";
 }
-
-void MyOpenGLWidget::papershader(std::string vert, std::string frag)
-{
-	if(!m_Shader)
-		m_Shader = std::make_unique<Shader>(vert.c_str(), frag.c_str());
-}
-
 void MyOpenGLWidget::papaercamera()
 {
 	// 创建透视相机：视场角 45度，宽高比 800/600，近平面 0.1，远平面 100

@@ -6,6 +6,17 @@
 #include "Shader.h"
 #include "Texture.h"
 
+#include "Material/imageMaterial.h"
+
+
+class Renderer;
+class Scene;
+class DirectionalLight;
+class PointLight;
+class SpotLight;
+class AmbientLight;
+class Mesh;
+
 class MyOpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_5_Core
 {
 	Q_OBJECT
@@ -16,12 +27,10 @@ protected:
 	virtual void initializeGL() override;
 	virtual void resizeGL(int w, int h) override;
 	virtual void paintGL() override;
-	unsigned int VBO, VAO,EBO=0;
 
 public:
 	void switchTexture(const std::string& imagePath);
-	void paperrectangle();
-	void papershader(std::string vert, std::string frag);
+	void createImageMesh(Texture* texture);
 	void papaercamera();
 	void loadTexture(const std::string& imagePath);
 protected:
@@ -38,12 +47,28 @@ private:
 	//着色器
 	std::unique_ptr<Shader> m_Shader;
 
-	//摄像机
-	Camera* m_camera = nullptr; // 透视摄像机
-	CameraControl* m_cameraControl = nullptr; // 摄像机控制器
+
 
 	// 纹理
 	Texture* m_texture = nullptr;
 
 	float m_rotationAngle = 0.0f;  // 添加旋转角度变量
+
+	// 渲染框架
+	Renderer* m_renderer{ nullptr };
+	Scene* m_scene{ nullptr };
+
+	// 图像对象
+	Mesh* m_imageMesh{ nullptr };
+	Material* m_imageMaterial{ nullptr };
+
+	// 相机
+	Camera* m_camera{ nullptr };
+	CameraControl* m_cameraControl{ nullptr };
+
+	// 光源(为Renderer接口准备)
+	DirectionalLight* m_dirLight{ nullptr };
+	std::vector<PointLight*> m_pointLights;
+	SpotLight* m_spotLight{ nullptr };
+	AmbientLight* m_ambLight{ nullptr };
 };
