@@ -13,6 +13,8 @@
 #include "Geometry.h"                        
 #include "material/imageMaterial.h"
 #include "material/DicomMaterial.h"
+#include "material/cubeMaterial.h"
+#include "material/PhongMaterial.h"
 #include "mesh/Mesh.h"                       
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
@@ -39,6 +41,7 @@ void MyOpenGLWidget::initializeGL()
 	m_dirLight = new DirectionalLight();
 	m_ambLight = new AmbientLight();
 	m_spotLight = nullptr;
+	paperbox();
 	papaercamera();
 }
 
@@ -65,94 +68,6 @@ void MyOpenGLWidget::paintGL()
 	update(); // 请求下一帧重绘
 }
 
-//
-//void MyOpenGLWidget::switchTexture(const std::string& imagePath)
-//{
-//	// 在 OpenGL 线程中执行
-//	makeCurrent();
-//
-//	qDebug() << "[切换纹理] 新路径:" << QString::fromStdString(imagePath);
-//
-//	// 加载新纹理
-//	Texture* newTexture = Texture::createTexture(imagePath, 2);
-//
-//	if (!newTexture) {
-//		qDebug() << "ERROR: 新纹理加载失败:" << QString::fromStdString(imagePath);
-//		doneCurrent();
-//		return;
-//	}
-//
-//	// ✅ 检测新纹理类型
-//	DicomTexture* newDicomTex = dynamic_cast<DicomTexture*>(newTexture);
-//	bool isNewDicom = (newDicomTex != nullptr);
-//
-//	// ✅ 检测当前材质类型
-//	bool isCurrentDicom = false;
-//	if (m_imageMaterial) {
-//		DicomMaterial* currentDicomMat = dynamic_cast<DicomMaterial*>(m_imageMaterial);
-//		isCurrentDicom = (currentDicomMat != nullptr);
-//	}
-//
-//	// ========== 情况1: 首次创建 ==========
-//	if (!m_imageMesh || !m_imageMaterial) {
-//		qDebug() << "🆕 首次创建 Mesh";
-//		createImageMesh(newTexture);
-//	}
-//	// ========== 情况2: 类型相同,仅更新纹理 ==========
-//	else if (isNewDicom == isCurrentDicom) {
-//		qDebug() << "🔄 类型相同,更新纹理";
-//
-//		if (isCurrentDicom) {
-//			// DICOM -> DICOM
-//			DicomMaterial* dicomMat = dynamic_cast<DicomMaterial*>(m_imageMaterial);
-//			dicomMat->mDiffuse = newTexture;
-//
-//			// ✅ 更新像素值范围
-//			dicomMat->mMinPixelValue = newDicomTex->getMinPixelValue();
-//			dicomMat->mMaxPixelValue = newDicomTex->getMaxPixelValue();
-//
-//			qDebug() << "  ✅ DICOM材质更新完成";
-//		}
-//		else {
-//			// 普通图片 -> 普通图片
-//			ImageMaterial* imageMat = dynamic_cast<ImageMaterial*>(m_imageMaterial);
-//			imageMat->mDiffuse = newTexture;
-//			qDebug() << "  ✅ Image材质更新完成";
-//		}
-//	}
-//	// ========== 情况3: 类型不同,重建整个 Mesh ==========
-//	else {
-//		qDebug() << "⚠️ 材质类型切换: "
-//			<< (isCurrentDicom ? "DICOM" : "Image")
-//			<< " -> "
-//			<< (isNewDicom ? "DICOM" : "Image");
-//
-//		// ✅ 从场景中移除旧 Mesh
-//		if (m_imageMesh) {
-//			m_scene->removeChild(m_imageMesh);
-//			delete m_imageMesh;
-//			m_imageMesh = nullptr;
-//		}
-//
-//		// ✅ 删除旧材质(Mesh 会管理 Geometry,但不管理 Material)
-//		if (m_imageMaterial) {
-//			delete m_imageMaterial;
-//			m_imageMaterial = nullptr;
-//		}
-//
-//		// ✅ 创建新 Mesh
-//		createImageMesh(newTexture);
-//		qDebug() << "  ✅ Mesh 重建完成";
-//	}
-//
-//	qDebug() << "✅ 纹理切换成功! 新尺寸:"
-//		<< newTexture->getWidth() << "x" << newTexture->getHeight();
-//
-//	// 触发重绘
-//	update();
-//
-//	doneCurrent();
-//}
 
 void MyOpenGLWidget::switchTexture(const std::string& imagePath)
 {
@@ -320,25 +235,44 @@ void MyOpenGLWidget::createImageMesh(Texture* texture)
 void MyOpenGLWidget::papaercamera()
 {
 	// 创建透视相机：视场角 45度，宽高比 800/600，近平面 0.1，远平面 100
-	//m_camera = new PerspectiveCamera(30.0f, 800.0f / 500.0f, 0.0001f, 100.0f);
+    m_camera = new PerspectiveCamera(30.0f, 800.0f / 500.0f, 0.0001f, 100.0f);
 	// 动态计算宽高比
 	float aspect = static_cast<float>(width()) / static_cast<float>(height());
 
 	// 创建正交相机 - 无透视变形,完美显示2D图像
-	m_camera = new OrthographicCamera(
-		-aspect,  // 根据窗口宽高比调整左右边界
-		aspect,
-		1.0f,     // 固定上下边界
-		-1.0f,
-		0.1f,     // 近平面
-		100.0f    // 远平面
-	);
+	//m_camera = new OrthographicCamera(
+	//	-aspect,  // 根据窗口宽高比调整左右边界
+	//	aspect,
+	//	1.0f,     // 固定上下边界
+	//	-1.0f,
+	//	0.1f,     // 近平面
+	//	100.0f    // 远平面
+	//);
 
 	// 相机位置
 	m_camera->mPosition = glm::vec3(0.0f, 0.0f, 1.0f);
 	// 创建相机控制器
-	m_cameraControl = new Camera2DControl();
+	m_cameraControl = new TrackBallCameraControl();
+	//m_cameraControl = new Camera2DControl();
 	m_cameraControl->setcamera(m_camera);
+}
+
+void MyOpenGLWidget::paperbox()
+{
+	if (!m_scene) {
+		qDebug() << "ERROR: scene 为空";
+		return;
+	}
+	Texture* envTexBox = new Texture("assets/textures/box.png", 0);
+	auto box = Geometry::createBox(1.0f);
+	auto boxmat = new PhongMaterial();
+	boxmat->mDiffuse = envTexBox;
+	boxmat->mDepthWrite = false;
+
+	Mesh* boxMesh = new Mesh(box, boxmat);
+	boxMesh->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	m_scene->addChild(boxMesh);
+
 }
 
 void MyOpenGLWidget::loadTexture(const std::string& imagePath)

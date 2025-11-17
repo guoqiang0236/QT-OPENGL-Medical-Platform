@@ -32,6 +32,7 @@ public:
 	void switchTexture(const std::string& imagePath);
 	void createImageMesh(Texture* texture);
 	void papaercamera();
+	void paperbox();
 	void loadTexture(const std::string& imagePath);
 
 	void setCurrentSlice(int index);
