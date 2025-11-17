@@ -135,7 +135,7 @@ InstancedMesh* AssimpInstanceLoader::processMesh(aiMesh* aimesh, const aiScene* 
 		texture = processTexture(aiMat, aiTextureType_DIFFUSE, scene, rootPath);
 		if (texture == nullptr)
 		{
-			texture = Texture::createTexture("../assets/textures/defaultTexture.jpg", 0);
+			texture = Texture::createTexture("assets/textures/defaultTexture.jpg", 0);
 		}
 		texture->setUnit(0);
 		material->mDiffuse = texture;
@@ -143,14 +143,14 @@ InstancedMesh* AssimpInstanceLoader::processMesh(aiMesh* aimesh, const aiScene* 
 		auto speclarMask = processTexture(aiMat, aiTextureType_SPECULAR, scene, rootPath);
 		if (speclarMask == nullptr)
 		{
-			speclarMask = Texture::createTexture("../assets/textures/defaultTexture.jpg", 0);
+			speclarMask = Texture::createTexture("assets/textures/defaultTexture.jpg", 0);
 		}
 		speclarMask->setUnit(1);
 		material->mSpecularMask = speclarMask;
 	}
 	else
 	{
-		material->mDiffuse = Texture::createTexture("../assets/textures/defaultTexture.jpg", 0);
+		material->mDiffuse = Texture::createTexture("assets/textures/defaultTexture.jpg", 0);
 	}
 	return new InstancedMesh(geometry, material, instanceCount);
 }

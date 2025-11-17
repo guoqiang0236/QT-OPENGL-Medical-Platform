@@ -14,17 +14,17 @@
 Renderer::Renderer()
 {
 	initializeOpenGLFunctions();
-	mPhongShader = new Shader("../assets/shaders/phong.vert", "../assets/shaders/phong.frag");
-	mWhiteShader = new Shader("../assets/shaders/white.vert", "../assets/shaders/white.frag");
-	mImageShader = new Shader("../assets/shaders/image.vert", "../assets/shaders/image.frag");
-	mDepthShader = new Shader("../assets/shaders/depth.vert", "../assets/shaders/depth.frag");
-	mOpacityMaskShader = new Shader("../assets/shaders/phongOpacityMask.vert", "../assets/shaders/phongOpacityMask.frag");
-	mScreenShader = new Shader("../assets/shaders/screen.vert", "../assets/shaders/screen.frag");
-	mCubeShader = new Shader("../assets/shaders/cube.vert", "../assets/shaders/cube.frag");
-	mPhongEnvShader = new Shader("../assets/shaders/phongEnv.vert", "../assets/shaders/PhongEnv.frag");
-	mPhongInstancedShader = new Shader("../assets/shaders/phongInstance.vert", "../assets/shaders/phongInstance.frag");
-	mGrassInstanceShader = new Shader("../assets/shaders/grassInstance.vert", "../assets/shaders/grassInstance.frag");
-	mDicomShader = new Shader("../assets/shaders/dicom.vert", "../assets/shaders/dicom.frag");  
+	mPhongShader = new Shader("assets/shaders/phong.vert", "assets/shaders/phong.frag");
+	mWhiteShader = new Shader("assets/shaders/white.vert", "assets/shaders/white.frag");
+	mImageShader = new Shader("assets/shaders/image.vert", "assets/shaders/image.frag");
+	mDepthShader = new Shader("assets/shaders/depth.vert", "assets/shaders/depth.frag");
+	mOpacityMaskShader = new Shader("assets/shaders/phongOpacityMask.vert", "assets/shaders/phongOpacityMask.frag");
+	mScreenShader = new Shader("assets/shaders/screen.vert", "assets/shaders/screen.frag");
+	mCubeShader = new Shader("assets/shaders/cube.vert", "assets/shaders/cube.frag");
+	mPhongEnvShader = new Shader("assets/shaders/phongEnv.vert", "assets/shaders/PhongEnv.frag");
+	mPhongInstancedShader = new Shader("assets/shaders/phongInstance.vert", "assets/shaders/phongInstance.frag");
+	mGrassInstanceShader = new Shader("assets/shaders/grassInstance.vert", "assets/shaders/grassInstance.frag");
+	mDicomShader = new Shader("assets/shaders/dicom.vert", "assets/shaders/dicom.frag");  
 	m_timer.start();
 }
 

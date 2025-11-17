@@ -10,7 +10,8 @@ project(QtGuiApp LANGUAGES CXX)
 
 # 在 VS 工程中显示 assets 文件夹
 file(GLOB ASSETS "./assets" )
-file(COPY ${ASSETS} DESTINATION ${CMAKE_BINARY_DIR})
+#file(COPY ${ASSETS} DESTINATION ${CMAKE_BINARY_DIR})
+# 复制 assets 文件夹到可执行文件所在目录
 file(GLOB_RECURSE ASSET_FILES "${CMAKE_CURRENT_SOURCE_DIR}/assets/*")
 message(STATUS "Assets folder path: ${CMAKE_CURRENT_SOURCE_DIR}/assets")
 add_custom_target(AssetsInIDE SOURCES ${ASSET_FILES})
@@ -66,6 +67,9 @@ qt_add_resources(RESOURCES resources.qrc)
 # 创建可执行文件，根据构建类型动态设置 WIN32 选项
 #add_executable(QtGuiApp WIN32 ${SRC_FILES} ${RESOURCES} res/icon/apprc.rc)  # Release 模式：无控制台
 add_executable(QtGuiApp ${SRC_FILES} ${RESOURCES}  res/icon/apprc.rc)
+set_target_properties(QtGuiApp PROPERTIES
+    VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/$<CONFIG>"
+)
 
 # 添加预编译头支持
 target_precompile_headers(QtGuiApp PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/source/pch.h")
@@ -107,6 +111,14 @@ target_link_libraries(QtGuiApp PRIVATE
 if(MSVC)
     add_compile_options(/source-charset:utf-8)
 endif()
+
+# 复制 assets 文件夹到可执行文件目录（构建时）
+add_custom_command(TARGET QtGuiApp POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets"
+        "$<TARGET_FILE_DIR:QtGuiApp>/assets"
+    COMMENT "Copying assets folder to output directory"
+)
 
 # 复制 opencv_world*.dll 到可执行文件目录
 add_custom_command(TARGET QtGuiApp POST_BUILD
