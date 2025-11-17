@@ -15,6 +15,7 @@
 #include "material/DicomMaterial.h"
 #include "material/cubeMaterial.h"
 #include "material/PhongMaterial.h"
+#include "Material/LightTestMaterial.h"
 #include "mesh/Mesh.h"                       
 #include "Light/DirectionalLight.h"
 #include "Light/PointLight.h"
@@ -250,7 +251,7 @@ void MyOpenGLWidget::papaercamera()
 	//);
 
 	// 相机位置
-	m_camera->mPosition = glm::vec3(0.0f, 0.0f, 1.0f);
+	m_camera->mPosition = glm::vec3(0.0f, 0.0f, 5.0f);
 	// 创建相机控制器
 	m_cameraControl = new TrackBallCameraControl();
 	//m_cameraControl = new Camera2DControl();
@@ -265,14 +266,19 @@ void MyOpenGLWidget::paperbox()
 	}
 	Texture* envTexBox = new Texture("assets/textures/box.png", 0);
 	auto box = Geometry::createBox(1.0f);
-	auto boxmat = new PhongMaterial();
+	auto boxmat = new LightTestMaterial();
 	boxmat->mDiffuse = envTexBox;
-	boxmat->mDepthWrite = false;
 
+	
 	Mesh* boxMesh = new Mesh(box, boxmat);
 	boxMesh->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	m_scene->addChild(boxMesh);
 
+	if (m_dirLight)
+	{
+		m_dirLight->mDirection = glm::vec3(-1.0f, -1.0f, -1.0f);
+		m_dirLight->mColor = glm::vec3(0.9, 0.85f, 0.75f);
+	}
 }
 
 void MyOpenGLWidget::loadTexture(const std::string& imagePath)

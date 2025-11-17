@@ -14,7 +14,8 @@ enum class MaterialType {
     PhongEnvMaterial,
     PhongInstanceMaterial,
     GrassInstanceMaterial,
-    DicomMaterial
+    DicomMaterial,
+    LightTestMaterial
 };
 
 class Material :public QObject {

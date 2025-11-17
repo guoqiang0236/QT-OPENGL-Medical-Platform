@@ -9,6 +9,8 @@
 #include "../Material/phongInstanceMaterial.h"
 #include "../Material/grassInstanceMaterial.h"
 #include "../Material/DicomMaterial.h"
+#include "../Material/LightTestMaterial.h"
+
 #include "../Mesh/instancedMesh.h"
 
 Renderer::Renderer()
@@ -25,6 +27,7 @@ Renderer::Renderer()
 	mPhongInstancedShader = new Shader("assets/shaders/phongInstance.vert", "assets/shaders/phongInstance.frag");
 	mGrassInstanceShader = new Shader("assets/shaders/grassInstance.vert", "assets/shaders/grassInstance.frag");
 	mDicomShader = new Shader("assets/shaders/dicom.vert", "assets/shaders/dicom.frag");  
+	mLightTestShader = new Shader("assets/shaders/lighttest.vert", "assets/shaders/lighttest.frag");
 	m_timer.start();
 }
 
@@ -539,6 +542,28 @@ void Renderer::rendererObject(Object* object, Camera* camera,
 			shader->setMatrix4x4("view", camera->getViewMatrix());
 			shader->setMatrix4x4("projection", camera->getProjectionMatrix());
 		}
+										break;
+		case MaterialType::LightTestMaterial: {
+			LightTestMaterial* lightMat = static_cast<LightTestMaterial*>(material);
+
+			// 绑定纹理
+			if (lightMat->mDiffuse) {
+				lightMat->mDiffuse->bind();
+				shader->setInt("sampler", 0);
+			}
+
+			// MVP 矩阵更新
+			shader->setMatrix4x4("modelMatrix", mesh->getModelMatrix());
+			shader->setMatrix4x4("viewMatrix", camera->getViewMatrix());
+			shader->setMatrix4x4("projectionMatrix", camera->getProjectionMatrix());
+
+			//光源
+			//平行光
+			shader->setVector3("lightDirection", dirLight->mDirection);
+			shader->setVector3("lightColor", dirLight->mColor);
+
+		}
+											break;
 		default:
 			break;
 		}
@@ -633,6 +658,9 @@ Shader* Renderer::pickShader(MaterialType type)
 	case MaterialType::DicomMaterial:  
 		result = mDicomShader;
 		break;
+	case MaterialType::LightTestMaterial:
+		result = mLightTestShader;
+		break;
 	default:
 		std::cout << "Unknown material type to pick shader" << std::endl;
 		break;
@@ -717,5 +745,6 @@ void Renderer::setFaceCullingState(Material* material)
 		glDisable(GL_CULL_FACE);
 	}
 }
+
 
 
