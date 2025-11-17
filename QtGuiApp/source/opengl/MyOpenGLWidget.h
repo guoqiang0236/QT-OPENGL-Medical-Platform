@@ -33,6 +33,12 @@ public:
 	void createImageMesh(Texture* texture);
 	void papaercamera();
 	void loadTexture(const std::string& imagePath);
+
+	void setCurrentSlice(int index);
+signals:
+	// 当 DICOM 数据加载成功时发射信号
+	void dicomLoaded(int totalSlices, int currentSlice);
+
 protected:
 	void keyPressEvent(QKeyEvent* event) override;       // 对应键盘按下
 	void keyReleaseEvent(QKeyEvent* event) override;     // 对应键盘释放

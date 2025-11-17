@@ -30,7 +30,12 @@ private slots:
 	void ProgressChanged(int value, int max); // 进度条更新
     void OpenImg();
  
-    
+    // 处理 DICOM 加载完成
+    void onDicomLoaded(int totalSlices, int currentSlice);
+
+    // 处理滑块值变化
+    void onSliceChanged(int value);
+
     void Freeze();
 
 signals:

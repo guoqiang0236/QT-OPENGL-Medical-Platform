@@ -19,6 +19,7 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QSlider>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -36,9 +37,11 @@ public:
     QTabWidget *tabWidget;
     QWidget *tab_3;
     QGridLayout *gridLayout_7;
+    QPushButton *pushButton_opendicomdir;
+    QPushButton *pushButton_openimg;
     QFrame *frame;
     QLabel *label_showthreadnum;
-    QPushButton *pushButton_openimg;
+    QSlider *horizontalSlider_slice;
     QWidget *tab_4;
     QGridLayout *gridLayout_9;
     QPushButton *pushButton_3;
@@ -96,6 +99,16 @@ public:
         gridLayout_7 = new QGridLayout(tab_3);
         gridLayout_7->setObjectName("gridLayout_7");
         gridLayout_7->setContentsMargins(-1, 0, -1, -1);
+        pushButton_opendicomdir = new QPushButton(tab_3);
+        pushButton_opendicomdir->setObjectName("pushButton_opendicomdir");
+
+        gridLayout_7->addWidget(pushButton_opendicomdir, 1, 1, 1, 1);
+
+        pushButton_openimg = new QPushButton(tab_3);
+        pushButton_openimg->setObjectName("pushButton_openimg");
+
+        gridLayout_7->addWidget(pushButton_openimg, 0, 1, 1, 1);
+
         frame = new QFrame(tab_3);
         frame->setObjectName("frame");
         frame->setEnabled(false);
@@ -107,7 +120,7 @@ public:
         frame->setFrameShape(QFrame::Shape::StyledPanel);
         frame->setFrameShadow(QFrame::Shadow::Raised);
 
-        gridLayout_7->addWidget(frame, 3, 1, 1, 1);
+        gridLayout_7->addWidget(frame, 5, 1, 1, 1);
 
         label_showthreadnum = new QLabel(tab_3);
         label_showthreadnum->setObjectName("label_showthreadnum");
@@ -122,12 +135,13 @@ public:
         font.setBold(true);
         label_showthreadnum->setFont(font);
 
-        gridLayout_7->addWidget(label_showthreadnum, 2, 1, 1, 1);
+        gridLayout_7->addWidget(label_showthreadnum, 4, 1, 1, 1);
 
-        pushButton_openimg = new QPushButton(tab_3);
-        pushButton_openimg->setObjectName("pushButton_openimg");
+        horizontalSlider_slice = new QSlider(tab_3);
+        horizontalSlider_slice->setObjectName("horizontalSlider_slice");
+        horizontalSlider_slice->setOrientation(Qt::Orientation::Horizontal);
 
-        gridLayout_7->addWidget(pushButton_openimg, 0, 1, 1, 1);
+        gridLayout_7->addWidget(horizontalSlider_slice, 2, 1, 1, 1);
 
         tabWidget->addTab(tab_3, QString());
         tab_4 = new QWidget();
@@ -336,8 +350,9 @@ public:
     void retranslateUi(QMainWindow *MainWindow_UI)
     {
         MainWindow_UI->setWindowTitle(QCoreApplication::translate("MainWindow_UI", "MainWindow", nullptr));
-        label_showthreadnum->setText(QCoreApplication::translate("MainWindow_UI", "0", nullptr));
+        pushButton_opendicomdir->setText(QCoreApplication::translate("MainWindow_UI", "dicom\346\226\207\344\273\266\345\244\271", nullptr));
         pushButton_openimg->setText(QCoreApplication::translate("MainWindow_UI", "\351\200\211\346\213\251\344\270\200\345\274\240\345\233\276\347\211\207", nullptr));
+        label_showthreadnum->setText(QCoreApplication::translate("MainWindow_UI", "0", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_3), QCoreApplication::translate("MainWindow_UI", "\347\263\273\347\273\237\344\277\241\346\201\257", nullptr));
         pushButton_3->setText(QString());
         pushButton_4->setText(QString());

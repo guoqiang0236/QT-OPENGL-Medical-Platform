@@ -196,6 +196,34 @@ Texture::~Texture()
 {
 }
 
+//Texture* Texture::createTexture(const std::string& path, unsigned int unit)
+//{
+//    //1 检查是否缓存过本路径对应的纹理对象
+//    auto iter = mTextureCache.find(path);
+//    if (iter != mTextureCache.end())
+//    {
+//        //对于iterater, first->key, second->value
+//        return iter->second;
+//    }
+//    //2 ✅ 检查文件扩展名，判断是否为 DICOM 文件
+//    std::string extension = path.substr(path.find_last_of(".") + 1);
+//    std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+//
+//    Texture* texture = nullptr;
+//
+//    if (extension == "dcm") {
+//        // 使用 DicomTexture 加载 DICOM 文件
+//        qDebug() << "🔬 检测到 DICOM 文件，使用 DicomTexture 加载";
+//        texture = new DicomTexture(path, unit);
+//    }
+//    else {
+//        // 使用普通 Texture 加载图片
+//        texture = new Texture(path, unit);
+//    }
+//    mTextureCache[path] = texture;
+//    return texture;
+//}
+
 Texture* Texture::createTexture(const std::string& path, unsigned int unit)
 {
     //1 检查是否缓存过本路径对应的纹理对象
@@ -205,22 +233,63 @@ Texture* Texture::createTexture(const std::string& path, unsigned int unit)
         //对于iterater, first->key, second->value
         return iter->second;
     }
-    //2 ✅ 检查文件扩展名，判断是否为 DICOM 文件
-    std::string extension = path.substr(path.find_last_of(".") + 1);
-    std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 
     Texture* texture = nullptr;
 
-    if (extension == "dcm") {
-        // 使用 DicomTexture 加载 DICOM 文件
-        qDebug() << "🔬 检测到 DICOM 文件，使用 DicomTexture 加载";
-        texture = new DicomTexture(path, unit);
+    // 2. 检查路径是文件还是文件夹
+    QString qPath = QString::fromLocal8Bit(path.c_str());  // 使用本地编码
+    QFileInfo fileInfo(qPath);
+    // ✅ 添加调试信息
+   /* qDebug() << "========== 路径检查 ==========";
+    qDebug() << "原始路径:" << QString::fromStdString(path);
+    qDebug() << "绝对路径:" << fileInfo.absoluteFilePath();
+    qDebug() << "是否存在:" << fileInfo.exists();
+    qDebug() << "是否为目录:" << fileInfo.isDir();
+    qDebug() << "是否为文件:" << fileInfo.isFile();
+    qDebug() << "文件扩展名:" << fileInfo.suffix();
+    qDebug() << "============================";*/
+    if (fileInfo.isDir()) {
+        // ✅ 是文件夹,查找第一个 DICOM 文件
+        qDebug() << "📂 检测到文件夹，正在查找 DICOM 文件:" << QString::fromStdString(path);
+
+        // ✅ 修复:使用已转换的 qPath 创建 QDir
+        QDir dir(qPath);
+
+        // ✅ 添加调试:检查目录是否有效
+        if (!dir.exists()) {
+            qWarning() << "❌ 目录不存在:" << qPath;
+            return nullptr;
+        }
+
+        if (fileInfo.isDir()) {
+            // ✅ 是文件夹,直接传递文件夹路径给 DicomTexture
+            qDebug() << "📂 检测到文件夹，传递给 DicomTexture 处理:" << qPath;
+            texture = new DicomTexture(path, unit);  // ✅ 传递文件夹路径,让 DicomTexture 内部处理
+        }
+    }
+    else if (fileInfo.isFile()) {
+        // ✅ 是文件,检查扩展名
+        std::string extension = path.substr(path.find_last_of(".") + 1);
+        std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+
+        if (extension == "dcm") {
+            // 使用 DicomTexture 加载 DICOM 文件
+            qDebug() << "🔬 检测到 DICOM 文件，使用 DicomTexture 加载";
+            texture = new DicomTexture(path, unit);
+        }
+        else {
+            // 使用普通 Texture 加载图片
+            texture = new Texture(path, unit);
+        }
     }
     else {
-        // 使用普通 Texture 加载图片
-        texture = new Texture(path, unit);
+        qWarning() << "❌ 路径无效:" << QString::fromStdString(path);
+        return nullptr;
     }
-    mTextureCache[path] = texture;
+
+    if (texture) {
+        mTextureCache[path] = texture;
+    }
     return texture;
 }
 

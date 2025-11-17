@@ -24,6 +24,10 @@ public:
     float getMinPixelValue() const { return mMinPixelValue; }
     float getMaxPixelValue() const { return mMaxPixelValue; }
 
+    // 切片管理
+    bool setCurrentSlice(size_t index);
+    size_t getTotalSlices() const;
+    size_t getCurrentSliceIndex() const;
 
 private:
     std::unique_ptr<DicomImageReader> mDicomReader;

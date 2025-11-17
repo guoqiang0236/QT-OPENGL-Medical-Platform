@@ -65,6 +65,94 @@ void MyOpenGLWidget::paintGL()
 	update(); // 请求下一帧重绘
 }
 
+//
+//void MyOpenGLWidget::switchTexture(const std::string& imagePath)
+//{
+//	// 在 OpenGL 线程中执行
+//	makeCurrent();
+//
+//	qDebug() << "[切换纹理] 新路径:" << QString::fromStdString(imagePath);
+//
+//	// 加载新纹理
+//	Texture* newTexture = Texture::createTexture(imagePath, 2);
+//
+//	if (!newTexture) {
+//		qDebug() << "ERROR: 新纹理加载失败:" << QString::fromStdString(imagePath);
+//		doneCurrent();
+//		return;
+//	}
+//
+//	// ✅ 检测新纹理类型
+//	DicomTexture* newDicomTex = dynamic_cast<DicomTexture*>(newTexture);
+//	bool isNewDicom = (newDicomTex != nullptr);
+//
+//	// ✅ 检测当前材质类型
+//	bool isCurrentDicom = false;
+//	if (m_imageMaterial) {
+//		DicomMaterial* currentDicomMat = dynamic_cast<DicomMaterial*>(m_imageMaterial);
+//		isCurrentDicom = (currentDicomMat != nullptr);
+//	}
+//
+//	// ========== 情况1: 首次创建 ==========
+//	if (!m_imageMesh || !m_imageMaterial) {
+//		qDebug() << "🆕 首次创建 Mesh";
+//		createImageMesh(newTexture);
+//	}
+//	// ========== 情况2: 类型相同,仅更新纹理 ==========
+//	else if (isNewDicom == isCurrentDicom) {
+//		qDebug() << "🔄 类型相同,更新纹理";
+//
+//		if (isCurrentDicom) {
+//			// DICOM -> DICOM
+//			DicomMaterial* dicomMat = dynamic_cast<DicomMaterial*>(m_imageMaterial);
+//			dicomMat->mDiffuse = newTexture;
+//
+//			// ✅ 更新像素值范围
+//			dicomMat->mMinPixelValue = newDicomTex->getMinPixelValue();
+//			dicomMat->mMaxPixelValue = newDicomTex->getMaxPixelValue();
+//
+//			qDebug() << "  ✅ DICOM材质更新完成";
+//		}
+//		else {
+//			// 普通图片 -> 普通图片
+//			ImageMaterial* imageMat = dynamic_cast<ImageMaterial*>(m_imageMaterial);
+//			imageMat->mDiffuse = newTexture;
+//			qDebug() << "  ✅ Image材质更新完成";
+//		}
+//	}
+//	// ========== 情况3: 类型不同,重建整个 Mesh ==========
+//	else {
+//		qDebug() << "⚠️ 材质类型切换: "
+//			<< (isCurrentDicom ? "DICOM" : "Image")
+//			<< " -> "
+//			<< (isNewDicom ? "DICOM" : "Image");
+//
+//		// ✅ 从场景中移除旧 Mesh
+//		if (m_imageMesh) {
+//			m_scene->removeChild(m_imageMesh);
+//			delete m_imageMesh;
+//			m_imageMesh = nullptr;
+//		}
+//
+//		// ✅ 删除旧材质(Mesh 会管理 Geometry,但不管理 Material)
+//		if (m_imageMaterial) {
+//			delete m_imageMaterial;
+//			m_imageMaterial = nullptr;
+//		}
+//
+//		// ✅ 创建新 Mesh
+//		createImageMesh(newTexture);
+//		qDebug() << "  ✅ Mesh 重建完成";
+//	}
+//
+//	qDebug() << "✅ 纹理切换成功! 新尺寸:"
+//		<< newTexture->getWidth() << "x" << newTexture->getHeight();
+//
+//	// 触发重绘
+//	update();
+//
+//	doneCurrent();
+//}
 
 void MyOpenGLWidget::switchTexture(const std::string& imagePath)
 {
@@ -145,6 +233,21 @@ void MyOpenGLWidget::switchTexture(const std::string& imagePath)
 		qDebug() << "  ✅ Mesh 重建完成";
 	}
 
+	// ========== ✅ 新增: 更新 m_texture 指针并发射信号 ==========
+	m_texture = newTexture;
+
+	// ✅ 如果是 DICOM 纹理,发射信号通知 MainWindow
+	if (newDicomTex) {
+		size_t totalSlices = newDicomTex->getTotalSlices();
+		size_t currentSlice = newDicomTex->getCurrentSliceIndex();
+
+		qDebug() << "📊 DICOM 加载完成: 总切片数=" << totalSlices
+			<< " 当前切片=" << (currentSlice + 1);
+
+		// 发射信号
+		emit dicomLoaded(static_cast<int>(totalSlices), static_cast<int>(currentSlice));
+	}
+
 	qDebug() << "✅ 纹理切换成功! 新尺寸:"
 		<< newTexture->getWidth() << "x" << newTexture->getHeight();
 
@@ -153,8 +256,6 @@ void MyOpenGLWidget::switchTexture(const std::string& imagePath)
 
 	doneCurrent();
 }
-
-
 void MyOpenGLWidget::createImageMesh(Texture* texture)
 {
     if (!texture || !m_scene) {
@@ -245,6 +346,17 @@ void MyOpenGLWidget::loadTexture(const std::string& imagePath)
 	m_texture = Texture::createTexture(imagePath, 0);
 	if (!m_texture) {
 		qDebug() << "纹理加载失败:" << QString::fromStdString(imagePath);
+	}
+}
+
+void MyOpenGLWidget::setCurrentSlice(int index)
+{
+	DicomTexture* dicomTex = dynamic_cast<DicomTexture*>(m_texture);
+	if (dicomTex) {
+		if (dicomTex->setCurrentSlice(static_cast<size_t>(index))) {
+			qDebug() << "✅ 切换到切片:" << (index + 1) << "/" << dicomTex->getTotalSlices();
+			update();  // 刷新显示
+		}
 	}
 }
 

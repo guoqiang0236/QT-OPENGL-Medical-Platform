@@ -1,5 +1,23 @@
 #include "DicomTexture.h"
 #include <QDebug>
+//
+//DicomTexture::DicomTexture(const std::string& dicomPath, unsigned int unit)
+//{
+//    initializeOpenGLFunctions();
+//    mUnit = unit;
+//
+//    // 1. 创建 DICOM 读取器
+//    mDicomReader = std::make_unique<DicomImageReader>();
+//
+//    // 2. 加载 DICOM 文件
+//    if (!mDicomReader->loadDicomFile(dicomPath)) {
+//        qDebug() << "❌ DicomTexture: DICOM 加载失败";
+//        return;
+//    }
+//
+//    // 3. 创建 OpenGL 纹理
+//    loadFromDicomReader(mDicomReader.get());
+//}
 
 DicomTexture::DicomTexture(const std::string& dicomPath, unsigned int unit)
 {
@@ -9,19 +27,41 @@ DicomTexture::DicomTexture(const std::string& dicomPath, unsigned int unit)
     // 1. 创建 DICOM 读取器
     mDicomReader = std::make_unique<DicomImageReader>();
 
-    // 2. 加载 DICOM 文件
-    if (!mDicomReader->loadDicomFile(dicomPath)) {
-        qDebug() << "❌ DicomTexture: DICOM 加载失败";
-        return;
+    // 2. 检测路径类型
+    QString qPath = QString::fromLocal8Bit(dicomPath.c_str());  // 使用本地编码
+    QFileInfo fileInfo(qPath);
+    //QFileInfo fileInfo(QString::fromStdString(dicomPath));
+    bool loadSuccess = false;
+
+    if (fileInfo.isDir()) {
+        // ✅ 是文件夹,加载所有 DICOM 文件
+        qDebug() << "📂 检测到文件夹,正在加载所有 DICOM 文件:" << QString::fromStdString(dicomPath);
+        loadSuccess = mDicomReader->loadDicomFolder(dicomPath);
+
+        if (!loadSuccess) {
+            qWarning() << "❌ DicomTexture: 文件夹中未找到有效的 DICOM 文件";
+            return;
+        }
+
+        qDebug() << "✅ 已加载文件夹中的所有 DICOM 文件,当前显示第一个切片";
+    }
+    else {
+        // ✅ 是单个文件
+        qDebug() << "📄 检测到单个文件:" << QString::fromStdString(dicomPath);
+        loadSuccess = mDicomReader->loadDicomFile(dicomPath);
+
+        if (!loadSuccess) {
+            qDebug() << "❌ DicomTexture: DICOM 文件加载失败";
+            return;
+        }
     }
 
-    // 3. 创建 OpenGL 纹理
+    // 3. 创建 OpenGL 纹理(使用当前图像,默认为第一个切片)
     loadFromDicomReader(mDicomReader.get());
 }
-
 DicomTexture::~DicomTexture()
 {
-    mDicomReader.reset();
+   ;
 }
 
 bool DicomTexture::loadFromDicomReader(DicomImageReader* reader)
@@ -110,3 +150,35 @@ std::string DicomTexture::getModality() const
     return mDicomReader ? mDicomReader->getModality() : "";
 }
 
+bool DicomTexture::setCurrentSlice(size_t index)
+{
+    if (!mDicomReader) {
+        qWarning() << "❌ DICOM 读取器未初始化";
+        return false;
+    }
+
+    // 切换到指定切片
+    if (!mDicomReader->setCurrentImage(index)) {
+        qWarning() << "❌ 切片切换失败,索引:" << index;
+        return false;
+    }
+
+    // 重新加载纹理数据
+    if (!loadFromDicomReader(mDicomReader.get())) {
+        qWarning() << "❌ 纹理更新失败";
+        return false;
+    }
+
+    qDebug() << "✅ 已切换到切片" << (index + 1) << "/" << getTotalSlices();
+    return true;
+}
+
+size_t DicomTexture::getTotalSlices() const
+{
+    return mDicomReader ? mDicomReader->getTotalImages() : 0;
+}
+
+size_t DicomTexture::getCurrentSliceIndex() const
+{
+    return mDicomReader ? mDicomReader->getCurrentImageIndex() : 0;
+}

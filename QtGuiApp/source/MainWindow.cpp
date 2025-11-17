@@ -159,25 +159,71 @@ void MainWindow::ProgressChanged(int value, int max)
 
 void MainWindow::OpenImg()
 {
+	QPushButton* senderBtn = qobject_cast<QPushButton*>(sender());
+
+
 	QString ImgsDir = QCoreApplication::applicationDirPath()+"/../../QtGuiApp/assets/textures";
 	QDir dir(ImgsDir);
     QString initialDir = dir.absolutePath();
 
-	QString imagePathQ = QFileDialog::getOpenFileName(this, "选择图像文件", initialDir, "图像文件 (*.png *.jpg *.bmp *.dcm)");
-    
-    if(!imagePathQ.isEmpty())
+    QString path;
+    if (senderBtn == m_ui->pushButton_openimg)
     {
-		std::string imagePath =  std::string(imagePathQ.toLocal8Bit());
+        path = QFileDialog::getOpenFileName(this, "选择图像文件", initialDir, "图像文件 (*.png *.jpg *.bmp *.dcm)");
+    }
+    else if(senderBtn == m_ui->pushButton_opendicomdir)
+    {
+        path = QFileDialog::getExistingDirectory(this, "选择 DICOM 文件夹", initialDir,
+            QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+	}
+    
+    if(!path.isEmpty())
+    {
+		std::string imagePath =  std::string(path.toLocal8Bit());
 		m_ui->openGLWidget->switchTexture(imagePath);
 	}
 }
 
+void MainWindow::onDicomLoaded(int totalSlices, int currentSlice)
+{
+    qDebug() << "🎯 MainWindow 收到 DICOM 加载信号: 总切片=" << totalSlices
+        << " 当前切片=" << currentSlice;
+
+    if (totalSlices > 1) {
+        // 启用滑块
+        m_ui->horizontalSlider_slice->setEnabled(true);
+
+        // 设置范围 (0 到 totalSlices-1)
+        m_ui->horizontalSlider_slice->setMinimum(0);
+        m_ui->horizontalSlider_slice->setMaximum(totalSlices - 1);
+
+        // 设置当前值
+        m_ui->horizontalSlider_slice->setValue(currentSlice);
+
+        // 更新显示文本
+        m_ui->label_showthreadnum->setText(QString("%1/%2").arg(currentSlice + 1).arg(totalSlices));
+
+        qDebug() << "✅ 滑块已启用,范围: 0 -" << (totalSlices - 1);
+    }
+    else {
+        // 单张图像,禁用滑块
+        m_ui->horizontalSlider_slice->setEnabled(false);
+        m_ui->label_showthreadnum->setText("1/1");
+    }
+}
 
 
+void MainWindow::onSliceChanged(int value)
+{
+    qDebug() << "🔄 滑块值变化:" << value;
 
+    // 通知 OpenGL 控件切换切片
+    m_ui->openGLWidget->setCurrentSlice(value);
 
-
-
+    // 更新显示文本
+    int totalSlices = m_ui->horizontalSlider_slice->maximum() + 1;
+    m_ui->label_showthreadnum->setText(QString("%1/%2").arg(value + 1).arg(totalSlices));
+}
 
 void MainWindow::Freeze()
 {
@@ -218,10 +264,16 @@ void MainWindow::InitSlots()
     
 	connect(m_ui->pushButton_openimg, &QPushButton::clicked, this, &MainWindow::OpenImg);
     
-    
+    connect(m_ui->pushButton_opendicomdir, &QPushButton::clicked, this, &MainWindow::OpenImg);
 
 
-	
+    // 新增:连接 OpenGL 控件的 DICOM 加载信号
+    connect(m_ui->openGLWidget, &MyOpenGLWidget::dicomLoaded,
+        this, &MainWindow::onDicomLoaded);
+
+    // 新增:连接滑块值变化信号
+    connect(m_ui->horizontalSlider_slice, &QSlider::valueChanged,
+        this, &MainWindow::onSliceChanged);
    
 }
 
@@ -234,6 +286,11 @@ void MainWindow::UpdateGUI()
     setWindowIcon(QIcon(":/res/icon/logo.ico")); // 覆盖可能的默认值
     setWindowTitle("上海泊维胜科技有限公司");
 
+    // 初始化滑块为禁用状态
+    m_ui->horizontalSlider_slice->setEnabled(false);
+    m_ui->horizontalSlider_slice->setMinimum(0);
+    m_ui->horizontalSlider_slice->setMaximum(0);
+    m_ui->horizontalSlider_slice->setValue(0);
 }
 
 void MainWindow::UpdateSize()
