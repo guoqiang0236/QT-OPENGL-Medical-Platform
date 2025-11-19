@@ -69,6 +69,9 @@ private:
 	Mesh* m_imageMesh{ nullptr };
 	Material* m_imageMaterial{ nullptr };
 
+	// ✅ 新增:盒子对象
+	Mesh* m_boxMesh{ nullptr };
+
 	// 相机
 	Camera* m_camera{ nullptr };
 	CameraControl* m_cameraControl{ nullptr };
@@ -78,4 +81,5 @@ private:
 	std::vector<PointLight*> m_pointLights;
 	SpotLight* m_spotLight{ nullptr };
 	AmbientLight* m_ambLight{ nullptr };
+
 };

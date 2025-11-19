@@ -557,11 +557,20 @@ void Renderer::rendererObject(Object* object, Camera* camera,
 			shader->setMatrix4x4("viewMatrix", camera->getViewMatrix());
 			shader->setMatrix4x4("projectionMatrix", camera->getProjectionMatrix());
 
+			//摄像机位置
+			shader->setVector3("cameraPosition", camera->mPosition);
 			//光源
 			//平行光
 			shader->setVector3("lightDirection", dirLight->mDirection);
 			shader->setVector3("lightColor", dirLight->mColor);
 
+			//镜面光
+			
+			shader->setFloat("specularIntensity", 1);
+			
+
+			//环境光
+			shader->setVector3("ambientColor", glm::vec3(0.2,0.2,0.2));
 		}
 											break;
 		default:

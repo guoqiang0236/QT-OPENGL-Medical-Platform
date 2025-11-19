@@ -54,6 +54,17 @@ void MyOpenGLWidget::resizeGL(int w, int h)
 void MyOpenGLWidget::paintGL()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); 
+	
+	// ✅ 添加:让盒子自动旋转
+	//if (m_boxMesh) {
+	//	// 每帧增加旋转角度(0.5度/帧)
+	//	m_boxMesh->rotateY(0.5f);  // 绕Y轴旋转
+	//	//m_boxMesh->setScale(glm::vec3(1.0f, 2.0f, 1.0f));
+	//	// 可以同时绕多个轴旋转
+	//	m_boxMesh->rotateX(0.3f);  // 绕X轴
+	//	 m_boxMesh->rotateZ(0.2f);  // 绕Z轴
+	//}
+	
 	if (m_renderer && m_scene && m_camera) {
 		// 使用渲染器渲染场景
 		m_renderer->render(
@@ -211,7 +222,7 @@ void MyOpenGLWidget::createImageMesh(Texture* texture)
     }
     else {
         // ========== 普通图像 -> 使用 ImageMaterial ==========
-        qDebug() << "🖼️  检测到普通图像, 创建 ImageMaterial";
+        qDebug() << "🖼️  棜测到普通图像, 创建 ImageMaterial";
         
         ImageMaterial* imageMaterial = new ImageMaterial();
         imageMaterial->mDiffuse = texture;
@@ -269,10 +280,10 @@ void MyOpenGLWidget::paperbox()
 	auto boxmat = new LightTestMaterial();
 	boxmat->mDiffuse = envTexBox;
 
-	
-	Mesh* boxMesh = new Mesh(box, boxmat);
-	boxMesh->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-	m_scene->addChild(boxMesh);
+	// ✅ 保存盒子指针以便后续操作
+	m_boxMesh = new Mesh(box, boxmat);
+	m_boxMesh->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	m_scene->addChild(m_boxMesh);
 
 	if (m_dirLight)
 	{
