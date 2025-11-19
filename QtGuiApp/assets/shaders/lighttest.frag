@@ -7,38 +7,38 @@ in vec3 worldPosition;
 
 uniform sampler2D sampler;
 
-//¹âÔ´²ÎÊı
+//å…‰æºå‚æ•°
 uniform vec3 lightDirection;
 uniform vec3 lightColor;
 
 uniform vec3 ambientColor;
-//Ïà»úÊÀ½çÎ»ÖÃ
+//ç›¸æœºä¸–ç•Œä½ç½®
 uniform vec3 cameraPosition;
 
 uniform float specularIntensity;
 
 vec3 calculateDiffuse(vec3 lightDirN, vec3 lightCol, vec3 normalizedNormal, vec3 objectCol)
 {
-    // ¼ÆËãÂş·´ÉäÇ¿¶È (Lambert Ä£ĞÍ)
+    // è®¡ç®—æ¼«åå°„å¼ºåº¦ (Lambert æ¨¡å‹)
     float diffuseIntensity = clamp(dot(-lightDirN, normalizedNormal), 0.0, 1.0);
     
-    // ·µ»Ø×îÖÕµÄÂş·´ÉäÑÕÉ«
+    // è¿”å›æœ€ç»ˆçš„æ¼«åå°„é¢œè‰²
     return lightCol * diffuseIntensity * objectCol;
 }
 
 vec3 calculateSpecualColor(vec3 lightDirN, vec3 lightCol, vec3 normalizedNormal, vec3 viewDirN)
 {  
-    //·ÀÖ¹±³Ãæ¹âÕÕ
+    //é˜²æ­¢èƒŒé¢å…‰ç…§
     float dotresult = dot(-lightDirN, normalizedNormal);
     float flag =step(0.0, dotresult);
 
-     // ¼ÆËã·´Éä¹âÏß·½Ïò
+     // è®¡ç®—åå°„å…‰çº¿æ–¹å‘
     vec3 lightreflect = normalize(reflect(lightDirN, normalizedNormal));
     
-    // ¼ÆËã¾µÃæ·´ÉäÇ¿¶È
+    // è®¡ç®—é•œé¢åå°„å¼ºåº¦
     float specular = clamp(dot(lightreflect, -viewDirN), 0.0, 1.0);
 
-    //¿ØÖÆ¹â°ß´óĞ¡
+    //æ§åˆ¶å…‰æ–‘å¤§å°
     specular = pow(specular, 64.0);
 
     return lightCol*specular*flag*specularIntensity;
@@ -49,12 +49,12 @@ void main()
     vec3 normalizedNormal = normalize(normal);
     vec3 lightDirN = normalize(lightDirection);
     vec3 viewDirN = normalize(worldPosition - cameraPosition);
-   //1.»ñÈ¡ÎïÌåµÄÑÕÉ«
+   //1.è·å–ç‰©ä½“çš„é¢œè‰²
     vec3 objectcolor =texture(sampler, uv).xyz;
-   // 2. ¼ÆËãÂş·´Éä¹âÕÕ
+   // 2. è®¡ç®—æ¼«åå°„å…‰ç…§
     vec3 diffuseColor = calculateDiffuse(lightDirN, lightColor, normalizedNormal, objectcolor);
    
-   //3.¼ÆËã¸ß¹â·´Éä
+   //3.è®¡ç®—é«˜å…‰åå°„
    vec3 specularColor = calculateSpecualColor(lightDirN, lightColor, normalizedNormal, viewDirN);
  
    vec3 ambientColor = objectcolor * ambientColor;
